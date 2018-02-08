@@ -1,6 +1,8 @@
 #include "rotasi.h"
 #include <math.h>
 
+using namespace std;
+
 point rotasi(point pivot, point p2, double degree) {
     point result;
     double sind = sin(degree);
@@ -14,8 +16,7 @@ point rotasi(point pivot, point p2, double degree) {
     return result;
 }
 
-void rotasiBanyak (point pivot, point* pp, double degree, double banyak) {
-    point* p = pp;
+void rotasiBanyak (point pivot, vector<point> &pp, double degree, double banyak) {
     int i;
     for(i = 0; i < banyak; i++) {
         pp[i] = rotasi(pivot, pp[i], degree);

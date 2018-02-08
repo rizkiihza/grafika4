@@ -1,5 +1,7 @@
 #include "scaling.h"
-#include <math.h>
+#include <cmath>
+
+using namespace std;
 
 point scalePoint(point pivot, point p2, double kelipatan) {
    point output;
@@ -21,7 +23,7 @@ point scalePoint(point pivot, point p2, double kelipatan) {
     }
 }
 
-void scaleBanyak(point pivot, point *pp, double kelipatan, int banyak) {
+void scaleBanyak(point pivot, vector<point> &pp, double kelipatan, int banyak) {
     int i;
    for (i = 0; i < banyak; i++) {
        scalePoint(pivot, pp[i], kelipatan);
