@@ -1,7 +1,7 @@
 #include "rotasi.h"
 #include <math.h>
 
-point rotasi(point p1, point p2, int degree) {
+point rotasi(point p1, point p2, double degree) {
     point result;
     double sind = sin(degree);
     double cosd = cos(degree);
@@ -14,7 +14,7 @@ point rotasi(point p1, point p2, int degree) {
     return result;
 }
 
-void rotasibanyak (point p0, point* pp, int degree, int banyak) {
+void rotasibanyak (point p0, point* pp, double degree, double banyak) {
     point* p = pp;
     int i;
     for(i = 0; i < banyak; i++) {
