@@ -222,7 +222,7 @@ void fill(int x,int y, color* c){
 	}
 }
 
-void draw(point* charpoints, char* nama_file, int current_x, int current_y) {
+void draw(point* charpoints, char* nama_file, int current_x, int current_y, color* c) {
 	FILE* charmap;
 
 	charmap = fopen(nama_file, "r");
@@ -254,13 +254,13 @@ void draw(point* charpoints, char* nama_file, int current_x, int current_y) {
 		int j = 0;
 		while (charpoints[j].absis != 0) {
 			if (j==jumlah_maksimal_titik) {
-				draw_line(charpoints[j].absis, charpoints[j].ordinat, charpoints[0].absis, charpoints[0].ordinat, &white);
+				draw_line(charpoints[j].absis, charpoints[j].ordinat, charpoints[0].absis, charpoints[0].ordinat, c);
 			} else {
 				if (charpoints[j+1].absis == 0) {
-					draw_line(charpoints[j].absis, charpoints[j].ordinat, charpoints[0].absis, charpoints[0].ordinat, &white);
+					draw_line(charpoints[j].absis, charpoints[j].ordinat, charpoints[0].absis, charpoints[0].ordinat, c);
 					//printf("drawing from point %d %d to %d %d\n", charpoints[j].absis, charpoints[j].ordinat, charpoints[0].absis, charpoints[0].ordinat);
 				} else {
-					draw_line(charpoints[j].absis, charpoints[j].ordinat, charpoints[j+1].absis, charpoints[j+1].ordinat, &white);
+					draw_line(charpoints[j].absis, charpoints[j].ordinat, charpoints[j+1].absis, charpoints[j+1].ordinat, c);
 					//printf("drawing from point %d %d to %d %d\n", charpoints[j].absis, charpoints[j].ordinat, charpoints[j+1].absis, charpoints[j+1].ordinat);
 				}
 			}
@@ -273,7 +273,7 @@ void draw(point* charpoints, char* nama_file, int current_x, int current_y) {
 	for (int i = 0; i < jumlah_loop_warna; i++) {
 		int x,y;
 		fscanf(charmap, "%d %d", &x, &y);
-		fill(x+current_x, y+current_y,&green);
+		fill(x+current_x, y+current_y,c);
 	}
 
 	fclose;
@@ -321,7 +321,7 @@ void draw_huruf(int x, int y, char c){
 	}
 	point charpoints[jumlah_maksimal_titik];
 	inpfile[0] = c2;
-	draw(charpoints, inpfile, x, y);
+	draw(charpoints, inpfile, x, y, &white);
 }
 
 void draw_kata(int* x, int* y, char* kata, int len){
@@ -407,7 +407,8 @@ int main() {
 	*/
 	clear_screen((int)(vinfo.xres), (int)(vinfo.yres));
 	point charpoints[jumlah_maksimal_titik];
-	draw(charpoints, "pesawat_tampak_depan.txt", (int)(vinfo.xres)/2, (int)(vinfo.yres)/2);
+	draw(charpoints, "pesawat_tampak_depan.txt", (int)(vinfo.xres)/2, (int)(vinfo.yres)/2, &white);
+	draw(charpoints, "baling.txt", (int)(vinfo.xres)/2, (int)(vinfo.yres)/2, &green);
 
 	munmap(fbp, screensize);
 
