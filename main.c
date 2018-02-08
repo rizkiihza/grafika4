@@ -268,13 +268,10 @@ void draw(point* charpoints, char* nama_file, int current_x, int current_y, colo
 		}
 	}
 	
-	int jumlah_loop_warna;
-	fscanf(charmap, "%d", &jumlah_loop_warna);
-	for (int i = 0; i < jumlah_loop_warna; i++) {
-		int x,y;
-		fscanf(charmap, "%d %d", &x, &y);
-		fill(x+current_x, y+current_y,c);
-	}
+	int x, y;
+	fscanf(charmap, "%d %d", &x, &y);
+	fill(x+current_x, y+current_y,c);
+	
 
 	fclose;
 }
