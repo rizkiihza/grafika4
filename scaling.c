@@ -1,18 +1,29 @@
 #include "scaling.h"
 #include <math.h>
 
-point scalePoint(point p1, point p2, double kelipatan) {
+point scalePoint(point pivot, point p2, double kelipatan) {
    point output;
 
-   int jarakx = abs(p2.x - p1.x);
-   int jaraky = abs(p2.y - p1.y);
+   int jarakx = abs(p2.x - pivot.x);
+   int jaraky = abs(p2.y - pivot.y);
 
-    if (p1. x < p2.x) {
-        output.x = p1.x - jarakx * kelipatan;
+    if (pivot. x < p2.x) {
+        output.x = pivot.x - jarakx * kelipatan;
     }
     else {
-        output.y
+        output.x = pivot.x + jarakx * kelipatan; 
+    }
+
+    if (pivot.y < p2.y) {
+        output.y = pivot.y - jaraky * kelipatan;
+    } else {
+        output.y = pivot.y + jaraky * kelipatan;
     }
 }
 
-void scaleArrayPoint(point p1, point *pp, double kelipatan, int banyak)
+void scaleBanyak(point pivot, point *pp, double kelipatan, int banyak) {
+    int i;
+   for (i = 0; i < banyak; i++) {
+       scalePoint(pivot, pp[i], kelipatan);
+   }
+}

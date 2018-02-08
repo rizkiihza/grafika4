@@ -1,5 +1,5 @@
 #include "point_warna.h"
 
-point scalePoint(point p1, point p2, double kelipatan);
+point scalePoint(point pivot, point p2, double kelipatan);
 
-void scaleArrayPoint(point p1, point *pp, double kelipatan, int banyak);
+void scaleBanyak(point pivot, point *pp, double kelipatan, int banyak);
