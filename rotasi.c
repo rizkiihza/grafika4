@@ -14,7 +14,7 @@ point rotasi(point p1, point p2, double degree) {
     return result;
 }
 
-void rotasibanyak (point p0, point* pp, int degree, double banyak) {
+void rotasibanyak (point p0, point* pp, double degree, double banyak) {
     point* p = pp;
     int i;
     for(i = 0; i < banyak; i++) {
