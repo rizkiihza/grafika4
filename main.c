@@ -208,21 +208,21 @@ void clear_screen(int width, int height) {
 //I.S. Bentuk Polygon sudah ada
 //F.S. Polygon telah diwarnai
 //x dan y adalah titik didalam polygon
-void fill(int x,int y){
+void fill(int x,int y, color* c){
 	
 	long int position = (x + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) + (y + vinfo.yoffset) * finfo.line_length;
 	if ((x<1)||(y<1)||(x>1366)||(y>700) || (*(fbp + position) == -1)) {
 		return;
 	} else {
-		draw_dot(x,y,&white);
-		fill(x,y+1);
-		fill(x,y-1);
-		fill(x+1,y);
-		fill(x-1,y);
+		draw_dot(x,y,c);
+		fill(x,y+1,c);
+		fill(x,y-1,c);
+		fill(x+1,y,c);
+		fill(x-1,y,c);
 	}
 }
 
-void draw(point* charpoints, char* nama_file, int current_x, int current_y) {
+void draw(point* charpoints, char* nama_file, int current_x, int current_y, color* c) {
 	FILE* charmap;
 
 	charmap = fopen(nama_file, "r");
@@ -231,57 +231,51 @@ void draw(point* charpoints, char* nama_file, int current_x, int current_y) {
 	fscanf(charmap, "%d", &jumlah_loop);
 	//printf("Jumlah loop = %d\n", jumlah_loop);
 
-	printf("jumlah loop aman\n");
+
 	for (int current_loop = 0; current_loop < jumlah_loop; current_loop++) {
-		printf("loop %d aman\n", current_loop);
+		
 		int i = 0;
 
 		for (int j = 0; j < jumlah_maksimal_titik; j++) {
 			charpoints[j].absis = 0;
 			charpoints[j].ordinat = 0;
-			printf("bla");
 		}
-		printf("tesA\n");
 		int jumlah_titik;
 		fscanf(charmap, "%d", &jumlah_titik);
-		printf("tesB\n");
 		//printf("Jumlah titik pada loop %d = %d\n", current_loop, jumlah_titik);
 		for (int k = 0; k < jumlah_titik; k++) {
 			int x,y;
 			fscanf(charmap, "%d  %d", &x, &y);
-			printf("Titik %d aman: %d %d\n", k, x, y);
 			//printf("%d %d ", x, y);
 			charpoints[k].absis = x + current_x;
 			charpoints[k].ordinat = y + current_y;
 			//printf("%d %d\n", charpoints[k].absis, charpoints[k].ordinat);
 		}
-		printf("tesC\n");
-		color white = {
-		  255,
-		  255,
-		  255,
-		  0
-		};
 		int j = 0;
 		while (charpoints[j].absis != 0) {
 			if (j==jumlah_maksimal_titik) {
-				draw_line(charpoints[j].absis, charpoints[j].ordinat, charpoints[0].absis, charpoints[0].ordinat, &white);
+				draw_line(charpoints[j].absis, charpoints[j].ordinat, charpoints[0].absis, charpoints[0].ordinat, c);
 			} else {
 				if (charpoints[j+1].absis == 0) {
-					draw_line(charpoints[j].absis, charpoints[j].ordinat, charpoints[0].absis, charpoints[0].ordinat, &white);
-					printf("drawing from point %d %d to %d %d\n", charpoints[j].absis, charpoints[j].ordinat, charpoints[0].absis, charpoints[0].ordinat);
+					draw_line(charpoints[j].absis, charpoints[j].ordinat, charpoints[0].absis, charpoints[0].ordinat, c);
+					//printf("drawing from point %d %d to %d %d\n", charpoints[j].absis, charpoints[j].ordinat, charpoints[0].absis, charpoints[0].ordinat);
 				} else {
-					draw_line(charpoints[j].absis, charpoints[j].ordinat, charpoints[j+1].absis, charpoints[j+1].ordinat, &white);
-					printf("drawing from point %d %d to %d %d\n", charpoints[j].absis, charpoints[j].ordinat, charpoints[j+1].absis, charpoints[j+1].ordinat);
+					draw_line(charpoints[j].absis, charpoints[j].ordinat, charpoints[j+1].absis, charpoints[j+1].ordinat, c);
+					//printf("drawing from point %d %d to %d %d\n", charpoints[j].absis, charpoints[j].ordinat, charpoints[j+1].absis, charpoints[j+1].ordinat);
 				}
 			}
 			j++;
 		}
 	}
-	int x,y;
-	fscanf(charmap, "%d %d", &x, &y);
-	//printf("Mulai warna dari %d %d", x+current_x, y+current_y);
-	fill(x+current_x, y+current_y);
+	
+	int jumlah_loop_warna;
+	fscanf(charmap, "%d", &jumlah_loop_warna);
+	for (int i = 0; i < jumlah_loop_warna; i++) {
+		int x,y;
+		fscanf(charmap, "%d %d", &x, &y);
+		fill(x+current_x, y+current_y,c);
+	}
+
 	fclose;
 }
 
@@ -327,7 +321,7 @@ void draw_huruf(int x, int y, char c){
 	}
 	point charpoints[jumlah_maksimal_titik];
 	inpfile[0] = c2;
-	draw(charpoints, inpfile, x, y);
+	draw(charpoints, inpfile, x, y, &white);
 }
 
 void draw_kata(int* x, int* y, char* kata, int len){
@@ -341,10 +335,11 @@ void draw_kata(int* x, int* y, char* kata, int len){
 	while(i < len){
 		curr = kata[i];
 		if(curr == '\0') break;
-		draw_huruf(xx, yy, curr);
+		if (curr != ' ') {
+			draw_huruf(xx, yy, curr);
+		}		
 		xx += icrx;
 		i++;
-		
 		if(i==spacepos){
 			yy += icry;
 			*y += icry;
@@ -410,14 +405,10 @@ int main() {
 	}
 	//draw_huruf(0,0,'a');
 	*/
-	printf("tes1\n");
-	point* charpoints;
-	printf("tes2\n");
-	int pivot_x = (int)(vinfo.xres)/2;
-	int pivot_y = (int)(vinfo.yres)/2;
-	printf("tes3 %d %d\n", pivot_x, pivot_y);
-	draw(charpoints, "pesawat_tampak_depan.txt", pivot_x, pivot_y);
-	printf("tes4\n");
+	clear_screen((int)(vinfo.xres), (int)(vinfo.yres));
+	point charpoints[jumlah_maksimal_titik];
+	draw(charpoints, "pesawat_tampak_depan.txt", (int)(vinfo.xres)/2, (int)(vinfo.yres)/2, &white);
+	draw(charpoints, "baling.txt", (int)(vinfo.xres)/2, (int)(vinfo.yres)/2, &green);
 
 	munmap(fbp, screensize);
 
