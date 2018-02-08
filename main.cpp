@@ -1,4 +1,5 @@
 #include "rotasi.h"
+#include "scaling.h"
 #include "point_warna.h"
 #include <stdio.h>
 #include <math.h>
@@ -199,8 +200,8 @@ void clear_screen(int width, int height) {
 
 int main () {
     point p1, p2;
-    p1.x = 200;
-    p1.y = 200;
+    p1.x = 650;
+    p1.y = 350;
     p2.x = 0;
     p2.y = 200;
     point res;
@@ -214,7 +215,7 @@ int main () {
     p[0].y = 0;
     p[1].x = 0;
     p[1].y = 10;
-    rotasiBanyak(p1, p, degreeToRad(45), 2);
+    //rotasiBanyak(p1, p, degreeToRad(45), 2);
     printf("%f %f\n", p[0].x, p[0].y);
     printf("%f %f\n", p[1].x, p[1].y);
 
@@ -260,12 +261,33 @@ int main () {
 	}
 	printf("The framebuffer device was mapped to memory successfully.\n");
 	
-
+	//pivot 650,350
+	p2.x = 650;
+	p2.y = 250;
+	vector<point> pp;
+	point ptemp;
+	ptemp.x = 600;
+	ptemp.y = 300;
+	pp.push_back(ptemp);
+	ptemp.x = 700;
+	ptemp.y = 300;
+	pp.push_back(ptemp);
+	ptemp.x = 700;
+	ptemp.y = 400;
+	pp.push_back(ptemp);
+	ptemp.x = 600;
+	ptemp.y = 400;
+	pp.push_back(ptemp);	
 	while (1) {
 		clear_screen(1366, 700);
 		draw_line(p1.x,p1.y,p2.x,p2.y,&white);
-		p2 = rotasi(p1,p2,degreeToRad(10));
 		
+		for (int i = 0; i < 3; i++) {
+			draw_line(pp[i].x,pp[i].y,pp[i+1].x,pp[i+1].y,&white);
+		}
+		draw_line(pp[3].x,pp[3].y,pp[0].x,pp[0].y,&white);
+		p2 = rotasi(p1,p2,degreeToRad(10));
+		scaleBanyak(p1, pp, 2, 4);
 		usleep(500000);
 	}
     return 0;
