@@ -268,13 +268,10 @@ void draw(point* charpoints, char* nama_file, int current_x, int current_y, colo
 		}
 	}
 	
-	int jumlah_loop_warna;
-	fscanf(charmap, "%d", &jumlah_loop_warna);
-	for (int i = 0; i < jumlah_loop_warna; i++) {
-		int x,y;
-		fscanf(charmap, "%d %d", &x, &y);
-		fill(x+current_x, y+current_y,c);
-	}
+	int x, y;
+	fscanf(charmap, "%d %d", &x, &y);
+	fill(x+current_x, y+current_y,c);
+	
 
 	fclose;
 }
@@ -407,8 +404,8 @@ int main() {
 	*/
 	clear_screen((int)(vinfo.xres), (int)(vinfo.yres));
 	point charpoints[jumlah_maksimal_titik];
-	draw(charpoints, "pesawat_tampak_depan.txt", (int)(vinfo.xres)/2, (int)(vinfo.yres)/2, &white);
 	draw(charpoints, "baling.txt", (int)(vinfo.xres)/2, (int)(vinfo.yres)/2, &green);
+	draw(charpoints, "pesawat_tampak_depan.txt", (int)(vinfo.xres)/2, (int)(vinfo.yres)/2, &white);
 
 	munmap(fbp, screensize);
 
