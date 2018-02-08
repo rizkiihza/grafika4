@@ -2,4 +2,4 @@
 
 point rotasi(point p1, point p2, int degree);
 
-void rotasiBanyak(point p0, point* p1, int d, int l);
+void rotasiBanyak(point p0, point* p1, int degree, int banyak);
