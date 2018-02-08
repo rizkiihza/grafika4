@@ -21,11 +21,13 @@ point scalePoint(point pivot, point p2, double kelipatan) {
     } else {
         output.y = pivot.y + jaraky * kelipatan;
     }
+
+    return output;
 }
 
 void scaleBanyak(point pivot, vector<point> &pp, double kelipatan, int banyak) {
-    int i;
+   int i;
    for (i = 0; i < banyak; i++) {
-       scalePoint(pivot, pp[i], kelipatan);
+       pp[i] = scalePoint(pivot, pp[i], kelipatan);
    }
 }
