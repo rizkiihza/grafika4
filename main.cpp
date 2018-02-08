@@ -11,6 +11,7 @@
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 #include <string.h>
+#include <pthread.h>
 
 // inisialisasi struct
 struct fb_var_screeninfo vinfo;
@@ -24,6 +25,16 @@ color white = {
 			 255,
 			 0
 	 };
+color black = {
+			 0,
+			 0,
+			 0,
+			 0
+	 };
+
+color green = {
+	0,255,255,0
+};
 
 
 int min(int y1, int y2){
@@ -198,6 +209,25 @@ void clear_screen(int width, int height) {
     }
 }
 
+long int pos(int x, int y){
+	long int position = (x + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) + (y + vinfo.yoffset) * finfo.line_length;
+	return position;
+}
+
+void fil(int x,int y, color* desired){
+
+	long int position = (x + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) + (y + vinfo.yoffset) * finfo.line_length;
+	if ((x<1)||(y<1)||(x>1366)||(y>700) || (*(fbp + position) == -1)) {
+		return;
+	} else {
+		draw_dot(x,y,desired);
+		fil(x+1,y,desired);
+		fil(x-1,y,desired);
+		fil(x,y-1,desired);
+		fil(x,y+1,desired);	
+	}
+}
+
 int main () {
     point p1, p2;
     p1.x = 650;
@@ -280,14 +310,19 @@ int main () {
 	pp.push_back(ptemp);	
 	while (1) {
 		clear_screen(1366, 700);
-		draw_line(p1.x,p1.y,p2.x,p2.y,&white);
+		
+		
 		
 		for (int i = 0; i < 3; i++) {
 			draw_line(pp[i].x,pp[i].y,pp[i+1].x,pp[i+1].y,&white);
 		}
 		draw_line(pp[3].x,pp[3].y,pp[0].x,pp[0].y,&white);
+		draw_dot(p1.x,p1.y,&black);
+		fil(p1.x,p1.y,&green);
+		draw_line(p1.x,p1.y,p2.x,p2.y,&green);
+		p2 = scalePoint(p1,p2,1.05);
 		p2 = rotasi(p1,p2,degreeToRad(10));
-		scaleBanyak(p1, pp, 2, 4);
+		scaleBanyak(p1, pp, 1.05, 4);
 		usleep(500000);
 	}
     return 0;
