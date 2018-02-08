@@ -1,5 +1,7 @@
 #include "point_warna.h"
+#include <vector>
+using namespace std;
 
-point rotasi(point p1, point p2, double degree);
+point rotasi(point pivot, point p2, double degree);
 
-void rotasiBanyak(point p0, point* p1, double degree, double banyak);
+void rotasiBanyak(point pivot,v vector<point> &pp, double degree, double banyak);

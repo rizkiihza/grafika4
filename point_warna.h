@@ -3,7 +3,7 @@
 
 typedef struct {
     int r, g, b, a;
-} warna;
+} color;
 
 typedef struct{
     double x;
