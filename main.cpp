@@ -237,40 +237,31 @@ void insertToVector(char* nama_file) {
 	charmap = fopen(nama_file, "r");
 
 	int jumlah_loop;
-	fscanf(charmap, "%d", &jumlah_loop);
 	//printf("Jumlah loop = %d\n", jumlah_loop);
 	point tempCharPoint;
-
-	for (int current_loop = 0; current_loop < jumlah_loop; current_loop++) {
 		
-		int i = 0;
-
-		for (int j = 0; j < 20; j++) {
-			tempCharPoint.x = 0;
-			tempCharPoint.y = 0;
-			pp.push_back(tempCharPoint);
-		}
-		int jumlah_titik;
-		fscanf(charmap, "%d", &jumlah_titik);
-		//printf("Jumlah titik pada loop %d = %d\n", current_loop, jumlah_titik);
-		for (int k = 0; k < jumlah_titik; k++) {
-			int x,y;
-			fscanf(charmap, "%d  %d", &x, &y);
-			//printf("%d %d ", x, y);
-			pp[k].x = x;
-			pp[k].y = y;
-			//printf("%d %d\n", charpoints[k].absis, charpoints[k].ordinat);
-		}
+	int i = 0;
+	int jumlah_titik;
+	fscanf(charmap, "%d", &jumlah_titik);
+	//printf("Jumlah titik pada loop %d = %d\n", current_loop, jumlah_titik);
+	for (int k = 0; k < jumlah_titik; k++) {
+		int x,y;
+		fscanf(charmap, "%d  %d", &x, &y);
+		//printf("%d %d ", x, y);
+		tempCharPoint.x = x+650;
+		tempCharPoint.y = y+350;
+		pp.push_back(tempCharPoint);
+		//printf("%d %d\n", charpoints[k].absis, charpoints[k].ordinat);
 	}
 	int jumlah_loop_warna;
-	fscanf(charmap, "%d", &jumlah_loop_warna);
-	for (int i = 0; i < jumlah_loop_warna; i++) {
-		int x,y;
-		fscanf(charmap, "%d %d", &x, &y);
-		tempCharPoint.x = x;
-		tempCharPoint.y = y;
-		fillvector.push_back(tempCharPoint);
-	}
+	// fscanf(charmap, "%d", &jumlah_loop_warna);
+	// for (int i = 0; i < jumlah_loop_warna; i++) {
+	// 	int x,y;
+	// 	fscanf(charmap, "%d %d", &x, &y);
+	// 	tempCharPoint.x = x;
+	// 	tempCharPoint.y = y;
+	// 	fillvector.push_back(tempCharPoint);
+	// }
 
 	fclose;
 }
@@ -342,23 +333,30 @@ int main () {
 
 	//pivot 650,350
 	p2.x = 650;
-	p2.y = 250;
+	p2.y = 300;
 	
 	point ptemp;
 	insertToVector("pesawat_tampak_depan.txt");
 	while (1) {
-		
-		for (int i = 0; i < pp.max_size-2; i++) {
-			draw_line(pp[i].x,pp[i].y,pp[i+1].x,pp[i+1].y,&white);
+		clear_screen(1366, 700);
+		for (int i = 0; i < pp.size()-1; i++) {
+			draw_line(pp[i].x, pp[i].y, pp[i+1].x, pp[i+1].y, &white);
 		}
-		draw_line(pp[pp.max_size].x,pp[pp.max_size].y,pp[0].x,pp[0].y,&white);
+		draw_line(pp[pp.size()-1].x,pp[pp.size()-1].y,pp[0].x,pp[0].y,&white);
 		draw_dot(p1.x,p1.y,&black);
 		fil(p1.x,p1.y,&green);
-		draw_line(p1.x,p1.y,p2.x,p2.y,&green);
-		p2 = scalePoint(p1,p2,1.05);
-		p2 = rotasi(p1,p2,degreeToRad(10));
-		scaleBanyak(p1, pp, 1.05, 4);
-		usleep(500000);
+		draw_line(p1.x,p1.y,p2.x,p2.y,&white);
+		usleep(250000);
+
+		// // clear screen mini
+		// for (int i = 0; i < pp.size()-1; i++) {
+		// 	draw_line(pp[i].x, pp[i].y, pp[i+1].x, pp[i+1].y, &black);
+		// }
+		// draw_line(pp[pp.size()-1].x,pp[pp.size()-1].y,pp[0].x,pp[0].y,&black);
+		p2 = scalePoint(p1,p2,1.1);
+		p2 = rotasi(p1,p2,degreeToRad(20));
+		scaleBanyak(p1, pp, 1.1, pp.size());
+		
 	}
     return 0;
 }
