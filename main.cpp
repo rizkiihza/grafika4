@@ -16,6 +16,8 @@
 // inisialisasi struct
 struct fb_var_screeninfo vinfo;
 struct fb_fix_screeninfo finfo;
+vector<point> pp;
+vector<point> fillvector;
 int layarx = 1366;
 int layary = 700;
 char *fbp = 0;
@@ -228,6 +230,51 @@ void fil(int x,int y, color* desired){
 	}
 }
 
+void insertToVector(char* nama_file) {
+	
+	FILE* charmap;
+
+	charmap = fopen(nama_file, "r");
+
+	int jumlah_loop;
+	fscanf(charmap, "%d", &jumlah_loop);
+	//printf("Jumlah loop = %d\n", jumlah_loop);
+	point tempCharPoint;
+
+	for (int current_loop = 0; current_loop < jumlah_loop; current_loop++) {
+		
+		int i = 0;
+
+		for (int j = 0; j < 20; j++) {
+			tempCharPoint.x = 0;
+			tempCharPoint.y = 0;
+			pp.push_back(tempCharPoint);
+		}
+		int jumlah_titik;
+		fscanf(charmap, "%d", &jumlah_titik);
+		//printf("Jumlah titik pada loop %d = %d\n", current_loop, jumlah_titik);
+		for (int k = 0; k < jumlah_titik; k++) {
+			int x,y;
+			fscanf(charmap, "%d  %d", &x, &y);
+			//printf("%d %d ", x, y);
+			pp[k].x = x;
+			pp[k].y = y;
+			//printf("%d %d\n", charpoints[k].absis, charpoints[k].ordinat);
+		}
+	}
+	int jumlah_loop_warna;
+	fscanf(charmap, "%d", &jumlah_loop_warna);
+	for (int i = 0; i < jumlah_loop_warna; i++) {
+		int x,y;
+		fscanf(charmap, "%d %d", &x, &y);
+		tempCharPoint.x = x;
+		tempCharPoint.y = y;
+		fillvector.push_back(tempCharPoint);
+	}
+
+	fclose;
+}
+
 int main () {
     point p1, p2;
     p1.x = 650;
@@ -290,33 +337,21 @@ int main () {
 		exit(4);
 	}
 	printf("The framebuffer device was mapped to memory successfully.\n");
+	clear_screen(1366, 700);
 	
+
 	//pivot 650,350
 	p2.x = 650;
 	p2.y = 250;
-	vector<point> pp;
+	
 	point ptemp;
-	ptemp.x = 600;
-	ptemp.y = 300;
-	pp.push_back(ptemp);
-	ptemp.x = 700;
-	ptemp.y = 300;
-	pp.push_back(ptemp);
-	ptemp.x = 700;
-	ptemp.y = 400;
-	pp.push_back(ptemp);
-	ptemp.x = 600;
-	ptemp.y = 400;
-	pp.push_back(ptemp);	
+	insertToVector("pesawat_tampak_depan.txt");
 	while (1) {
-		clear_screen(1366, 700);
 		
-		
-		
-		for (int i = 0; i < 3; i++) {
+		for (int i = 0; i < pp.max_size-2; i++) {
 			draw_line(pp[i].x,pp[i].y,pp[i+1].x,pp[i+1].y,&white);
 		}
-		draw_line(pp[3].x,pp[3].y,pp[0].x,pp[0].y,&white);
+		draw_line(pp[pp.max_size].x,pp[pp.max_size].y,pp[0].x,pp[0].y,&white);
 		draw_dot(p1.x,p1.y,&black);
 		fil(p1.x,p1.y,&green);
 		draw_line(p1.x,p1.y,p2.x,p2.y,&green);
