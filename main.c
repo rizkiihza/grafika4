@@ -407,8 +407,8 @@ int main() {
 	*/
 	clear_screen((int)(vinfo.xres), (int)(vinfo.yres));
 	point charpoints[jumlah_maksimal_titik];
-	draw(charpoints, "pesawat_tampak_depan.txt", (int)(vinfo.xres)/2, (int)(vinfo.yres)/2, &white);
 	draw(charpoints, "baling.txt", (int)(vinfo.xres)/2, (int)(vinfo.yres)/2, &green);
+	draw(charpoints, "pesawat_tampak_depan.txt", (int)(vinfo.xres)/2, (int)(vinfo.yres)/2, &white);
 
 	munmap(fbp, screensize);
 
