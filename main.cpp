@@ -17,6 +17,7 @@
 struct fb_var_screeninfo vinfo;
 struct fb_fix_screeninfo finfo;
 vector<point> pp;
+point fillPlane;
 vector<point> fillvector;
 int layarx = 1366;
 int layary = 700;
@@ -254,15 +255,10 @@ void insertToVector(char* nama_file) {
 		//printf("%d %d\n", charpoints[k].absis, charpoints[k].ordinat);
 	}
 	int jumlah_loop_warna;
-	// fscanf(charmap, "%d", &jumlah_loop_warna);
-	// for (int i = 0; i < jumlah_loop_warna; i++) {
-	// 	int x,y;
-	// 	fscanf(charmap, "%d %d", &x, &y);
-	// 	tempCharPoint.x = x;
-	// 	tempCharPoint.y = y;
-	// 	fillvector.push_back(tempCharPoint);
-	// }
-
+	int x,y;
+	fscanf(charmap, "%d %d", &x, &y);
+	fillPlane.x = x+650;
+	fillPlane.y = y+350;
 	fclose;
 }
 
@@ -338,22 +334,23 @@ int main () {
 	point ptemp;
 	insertToVector("pesawat_tampak_depan.txt");
 	while (1) {
-		clear_screen(1366, 700);
+		//clear_screen(1366, 700);
 		for (int i = 0; i < pp.size()-1; i++) {
 			draw_line(pp[i].x, pp[i].y, pp[i+1].x, pp[i+1].y, &white);
 		}
 		draw_line(pp[pp.size()-1].x,pp[pp.size()-1].y,pp[0].x,pp[0].y,&white);
 		draw_dot(p1.x,p1.y,&black);
-		fil(p1.x,p1.y,&green);
+		fil(fillPlane.x,fillPlane.y,&green);
 		draw_line(p1.x,p1.y,p2.x,p2.y,&white);
 		usleep(250000);
 
-		// // clear screen mini
-		// for (int i = 0; i < pp.size()-1; i++) {
-		// 	draw_line(pp[i].x, pp[i].y, pp[i+1].x, pp[i+1].y, &black);
-		// }
-		// draw_line(pp[pp.size()-1].x,pp[pp.size()-1].y,pp[0].x,pp[0].y,&black);
+		// clear screen mini
+		for (int i = 0; i < pp.size()-1; i++) {
+			draw_line(pp[i].x, pp[i].y, pp[i+1].x, pp[i+1].y, &black);
+		}
+		draw_line(pp[pp.size()-1].x,pp[pp.size()-1].y,pp[0].x,pp[0].y,&black);
 		p2 = scalePoint(p1,p2,1.1);
+        fillPlane = scalePoint(p1,fillPlane,1.1);
 		p2 = rotasi(p1,p2,degreeToRad(20));
 		scaleBanyak(p1, pp, 1.1, pp.size());
 		
