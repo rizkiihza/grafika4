@@ -334,15 +334,17 @@ int main () {
 	point ptemp;
 	insertToVector("pesawat_tampak_depan.txt");
 	while (1) {
-		//clear_screen(1366, 700);
+		clear_screen(1366, 700);
 		for (int i = 0; i < pp.size()-1; i++) {
 			draw_line(pp[i].x, pp[i].y, pp[i+1].x, pp[i+1].y, &white);
 		}
 		draw_line(pp[pp.size()-1].x,pp[pp.size()-1].y,pp[0].x,pp[0].y,&white);
 		draw_dot(p1.x,p1.y,&black);
 		fil(fillPlane.x,fillPlane.y,&green);
-		draw_line(p1.x,p1.y,p2.x,p2.y,&white);
-		usleep(250000);
+		for (int i = 0; i < 10; i++){  
+          draw_line(p1.x+i,p1.y+i,p2.x+i,p2.y+i,&white);    // Baling2
+        }
+		usleep(5000);
 
 		// clear screen mini
 		for (int i = 0; i < pp.size()-1; i++) {
