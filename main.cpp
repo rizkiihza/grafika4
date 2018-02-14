@@ -56,6 +56,14 @@ int max(int y1, int y2) {
 	}
 }
 
+point translasi(point *p, int dx, int dx){
+	point result;
+	result.x = p.x + dx;
+	result.y = p.y + dy;
+	
+	return result;
+}
+
 float degreeToRad(float degree) {
     return (degree * M_PI / 180);
 }
