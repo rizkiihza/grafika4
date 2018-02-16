@@ -275,9 +275,11 @@ void insertToVector(char* nama_file) {
 }
 
 int main () {
-    point p1, p2;
+    point p1, p2, p3;
     p1.x = 650;
     p1.y = 350;
+    p3.x = 0;
+    p3.y = 200;
     p2.x = 0;
     p2.y = 200;
     point res;
@@ -380,10 +382,17 @@ int main () {
         //usleep(50000);
 		draw_line(pp[pp.size()-1].x,pp[pp.size()-1].y,pp[0].x,pp[0].y,&black);
 		p2 = scalePoint(p1,p2,1.1);
-        fillPlane = scalePoint(p1,fillPlane,1.1);
-        fillPlane2 = scalePoint(p1,fillPlane2,1.1);
+        fillPlane = scalePoint(p3,fillPlane,1.1);
+        fillPlane2 = scalePoint(p3,fillPlane2,1.1);
 		p2 = rotasi(p1,p2,degreeToRad(20));
-		scaleBanyak(p1, pp, 1.1, pp.size());
+		scaleBanyak(p3, pp, 1.1, pp.size());
+        for (int i = 0; i < pp.size(); i++) {
+            pp[i].x += 10;
+        }
+        p1.x += 10;
+        p2.x += 10;
+        fillPlane.x += 10;
+        fillPlane2.x += 10;
 		loop++;
 	}
 
