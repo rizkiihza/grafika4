@@ -57,11 +57,11 @@ int max(int y1, int y2) {
 	}
 }
 
-point translasi(point *p, int dx, int dx){
+point translasi(point *p, int dx, int dy){
 	point result;
-	result.x = p.x + dx;
-	result.y = p.y + dy;
-	
+	result.x = p->x + dx;
+	result.y = p->y + dy;
+
 	return result;
 }
 
@@ -204,7 +204,7 @@ int draw_line(int x1, int y1, int x2, int y2, color* c) {
 }
 
 void clear_screen(int x, int y, int width, int height, color *desired) {
-    
+
 
     for(x=0; x<width; x++)
     {
@@ -243,13 +243,13 @@ void fil(int x,int y,char prev, color* desired){
 		    fil(x,y-1,2,desired);
         }
         if (prev != 2)  {
-		    fil(x,y+1,1,desired);	
+		    fil(x,y+1,1,desired);
         }
 	}
 }
 
 void insertToVector(char* nama_file) {
-	
+
 	FILE* charmap;
 
 	charmap = fopen(nama_file, "r");
@@ -257,7 +257,7 @@ void insertToVector(char* nama_file) {
 	int jumlah_loop;
 	//printf("Jumlah loop = %d\n", jumlah_loop);
 	point tempCharPoint;
-		
+
 	int i = 0;
 	int jumlah_titik;
 	fscanf(charmap, "%d", &jumlah_titik);
@@ -347,12 +347,12 @@ int main () {
 	}
 	printf("The framebuffer device was mapped to memory successfully.\n");
 	clear_screen(0,0,1366, 700, &black);
-	
+
 
 	//pivot 650,350
 	p2.x = 650;
 	p2.y = 300;
-	
+
 	point ptemp;
 	insertToVector("pesawat_tampak_depan.txt");
 	int loop = 0;
@@ -367,23 +367,23 @@ int main () {
         fil(p1.x,p1.y,0,&green);
 		fil(fillPlane.x,fillPlane.y,0,&green);
         fil(fillPlane2.x,fillPlane2.y,0,&green);
-		for (int i = 0; i < 30; i++){  
+		for (int i = 0; i < 30; i++){
           draw_line(p1.x,p1.y,p2.x+i,p2.y+i,&white);    // Baling2
         }
-        
+
         if (loop == 20) break;
 		// clear screen mini
         usleep(50000);
-        for (int i = 0; i < 30; i++){  
+        for (int i = 0; i < 30; i++){
           draw_line(p1.x,p1.y,p2.x+i,p2.y+i,&green);    // Baling2
         }
         if (p2.y > p1.y){
             clear_screen(0,p1.y-30,1366,p2.y+100,&black);
         } else {
             clear_screen(0,p2.y+100,1366,p1.y+30,&black);
-        } 
-        
-        
+        }
+
+
 		for (int i = 0; i < pp.size()-1; i++) {
 			draw_line(pp[i].x, pp[i].y, pp[i+1].x, pp[i+1].y, &black);
 		}
@@ -413,23 +413,23 @@ int main () {
         fil(p1.x,p1.y,0,&green);
 		fil(fillPlane.x,fillPlane.y,0,&green);
         fil(fillPlane2.x,fillPlane2.y,0,&green);
-		for (int i = 0; i < 30; i++){  
+		for (int i = 0; i < 30; i++){
           draw_line(p1.x,p1.y,p2.x+i,p2.y+i,&white);    // Baling2
         }
-        
+
         if (loop == 10) break;
 		// clear screen mini
         usleep(50000);
-        for (int i = 0; i < 30; i++){  
+        for (int i = 0; i < 30; i++){
           draw_line(p1.x,p1.y,p2.x+i,p2.y+i,&green);    // Baling2
         }
         if (p2.y > p1.y){
             clear_screen(0,pp[3].y,1366,p2.y+100,&black);
         } else {
             clear_screen(0,p2.y+100,1366,pp[8].y,&black);
-        } 
-        
-        
+        }
+
+
 		for (int i = 0; i < pp.size()-1; i++) {
 			draw_line(pp[i].x, pp[i].y, pp[i+1].x, pp[i+1].y, &black);
 		}
