@@ -263,8 +263,7 @@ void trimPolygon(viewport view, point *ArrNodes, point *nArrNodes, int *n){
 				nArrNodes[count] = np1;
 				nArrNodes[count+1] = np2;
 				nArrNodes[count+2] = temp;
-				nArrNodes[count+3] = np2;
-				count += 3;
+				count += 2;
 			}
 		}
 	}
