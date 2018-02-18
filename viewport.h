@@ -1,5 +1,5 @@
-#ifndef POINT_WARNA_H
-#define POINT_WARNA_H
+#ifndef VIEWPORT_H
+#define VIEWPORT_WARNA_H
 #include "point_warna.h"
 
 #define CHECK_BIT(var,pos) ((var) & (1<<(pos)))
