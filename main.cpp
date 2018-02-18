@@ -57,13 +57,13 @@ int max(int y1, int y2) {
 	}
 }
 
-point translasi(point *p, int dx, int dx){
-	point result;
-	result.x = p.x + dx;
-	result.y = p.y + dy;
+// point translasi(point *p, int dx, int dx){
+// 	point result;
+// 	result.x = p.x + dx;
+// 	result.y = p.y + dy;
 
-	return result;
-}
+// 	return result;
+// }
 
 float degreeToRad(float degree) {
     return (degree * M_PI / 180);
@@ -390,10 +390,10 @@ int main () {
         //usleep(50000);
 		draw_line(pp[pp.size()-1].x,pp[pp.size()-1].y,pp[0].x,pp[0].y,&black);
 		p2 = scalePoint(p1,p2,1.1);
-        fillPlane = scalePoint(p3,fillPlane,1.1);
-        fillPlane2 = scalePoint(p3,fillPlane2,1.1);
+        fillPlane = scalePoint(p1,fillPlane,1.1);
+        fillPlane2 = scalePoint(p1,fillPlane2,1.1);
 		p2 = rotasi(p1,p2,degreeToRad(20));
-		scaleBanyak(p3, pp, 1.1, pp.size());
+		scaleBanyak(p1, pp, 1.1, pp.size());
         for (int i = 0; i < pp.size(); i++) {
             pp[i].x += 10;
         }
@@ -447,4 +447,4 @@ int main () {
 
     return 0;
 }
-}
+
