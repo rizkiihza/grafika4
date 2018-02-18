@@ -71,7 +71,7 @@ int pointPos(viewport view, point p){
 }
 
 
-//Memotong garis terhadap XMin, Stat adalah hasil jika Stat = 1 berarti memotong, Stat = 0 berarti tidak berubah, Stat = -1 Garis berada diluar
+//Memotong garis terhadap XMin, Stat menunjukan potongan seperti apa.
 void trimLineXMin(viewport view, point p1, point p2,point *np1,point *np2, int *stat){
 	int pos1 = pointPos(view,p1);
 	int pos2 = pointPos(view,p2);
@@ -230,29 +230,42 @@ void trimLineYMax(viewport view, point p1, point p2,point *np1,point *np2, int *
 
 
 // ArrNodes adalah Array yang berisi titik sebelum di trim, nArrNodes adalah Array berisi titik setelah dilakukan trim, N adalah jumlah titik awal.
+// ArrNodes[0] harus == ArrNodes[n] (contoh A-B-C-A akan membentuk segitiga)
+// Baru sama XMin
 void trimPolygon(viewport view, point *ArrNodes, point *nArrNodes, int *n){
 	int total = *n;
 	int found = 0;
+	point temp;
 	point np1, np2;
 	int count = 0;
 	int stat;
 	//Trim terhadap Xmin
-	for (int i = 0; i+1 < total; i++){
+	for (int i = 0; (i+1)< total; i++){
 		trimLineXMin(view,ArrNodes[i],ArrNodes[i+1],&np1,&np2,&stat);
 		if(stat == 0){
+			nArrNodes[count] = np1;
+			nArrNodes[count+1] = np2;
+			count++;
+		}else if (stat == 1){
+			if(found == 1){
+				count++;
+				nArrNodes[count] = np1;
+				nArrNodes[count+1] = np2;
+				count++;
+			}else{
+				nArrNodes[count] = np1;
+				nArrNodes[count] = np2;
+				temp = np1;
+			}
 			
+		}else if (stat == 2){
+			if(found == 1){
+				nArrNodes[count] = np1;
+				nArrNodes[count+1] = np2;
+				nArrNodes[count+2] = temp;
+				nArrNodes[count+3] = np2;
+				count += 3;
+			}
 		}
-	}
-	//Trim terhadap Xmax
-	for (int i = 0; i+1 < total; i++){
-		trimLineXMax(view,ArrNodes[i],ArrNodes[i+1],&np1,&np2,&stat);
-	}
-	//Trim terhadap Ymin
-	for (int i = 0; i+1 < total; i++){
-		trimLineYmin(view,ArrNodes[i],ArrNodes[i+1],&np1,&np2,&stat);
-	}
-	//Trim terhadap Ymax
-	for (int i = 0; i+1 < total; i++){
-		trimLineYmax(view,ArrNodes[i],ArrNodes[i+1],&np1,&np2,&stat);
 	}
 }
