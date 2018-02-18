@@ -57,10 +57,10 @@ int max(int y1, int y2) {
 	}
 }
 
-point translasi(point *p, int dx, int dy){
+point translasi(point *p, int dx, int dx){
 	point result;
-	result.x = p->x + dx;
-	result.y = p->y + dy;
+	result.x = p.x + dx;
+	result.y = p.y + dy;
 
 	return result;
 }
@@ -276,7 +276,7 @@ void insertToVector(char* nama_file) {
 	fscanf(charmap, "%d %d", &x, &y);
 	fillPlane.x = x+650;
 	fillPlane.y = y+350;
-    fscanf(charmap, "%d %d", &x, &y);
+  fscanf(charmap, "%d %d", &x, &y);
 	fillPlane2.x = x+650;
 	fillPlane2.y = y+350;
 	fclose;
@@ -354,7 +354,7 @@ int main () {
 	p2.y = 300;
 
 	point ptemp;
-	insertToVector("pesawat_tampak_depan.txt");
+	insertToVector((char*)"pesawat_tampak_depan.txt");
 	int loop = 0;
     int increment = 0;
     while (increment < 2){
