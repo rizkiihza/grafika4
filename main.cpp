@@ -13,10 +13,8 @@
 #include <string.h>
 #include <pthread.h>
 
+
 // inisialisasi struct
-typedef struct{
-	point p1,p2,p3,p4;
-} viewport;
 
 struct fb_var_screeninfo vinfo;
 struct fb_fix_screeninfo finfo;
