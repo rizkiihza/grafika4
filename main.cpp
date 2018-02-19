@@ -12,7 +12,7 @@
 #include <sys/ioctl.h>
 #include <string.h>
 #include <pthread.h>
-
+#include "viewport.cpp"
 
 // inisialisasi struct
 
@@ -357,23 +357,37 @@ int main () {
 	insertToVector((char*)"pesawat_tampak_depan.txt");
 	int loop = 0;
     int increment = 0;
+    // initialize viewport
+    point pv1 = {x = 300, y = 200};
+    point pv2 = {x = 700, y = 200};
+    point pv3 = {x = 700, y = 500};
+    point pv4 = {x = 300, y = 500};
+    viewport view;
+    view.p1 = pv1;
+    view.p2 = pv2;
+    view.p3 = pv3;
+    view.p4 = pv4;
+    initialize(&view);
+    point* trimResult = new point[pp.size()];
+
     while (increment < 2){
     while (1) {
+        trimPolygon(view,pp,trimResult,pp.size());
 		for (int i = 0; i < pp.size()-1; i++) {
-			draw_line(pp[i].x, pp[i].y, pp[i+1].x, pp[i+1].y, &white);
+			draw_line(trimResult[i].x, trimResult[i].y, trimResult[i+1].x, trimResult[i+1].y, &white);
 		}
-		draw_line(pp[pp.size()-1].x,pp[pp.size()-1].y,pp[0].x,pp[0].y,&white);
+		draw_line(trimResult[pp.size()-1].x,trimResult[pp.size()-1].y,trimResult[0].x,trimResult[0].y,&white);
 		draw_dot(p1.x,p1.y,&black);
         fil(p1.x,p1.y,0,&green);
-		fil(fillPlane.x,fillPlane.y,0,&green);
-        fil(fillPlane2.x,fillPlane2.y,0,&green);
+		// fil(fillPlane.x,fillPlane.y,0,&green);
+        // fil(fillPlane2.x,fillPlane2.y,0,&green);
 		for (int i = 0; i < 30; i++){  
           draw_line(p1.x,p1.y,p2.x+i,p2.y+i,&white);    // Baling2
         }
         
         if (loop == 20) break;
 		// clear screen mini
-        usleep(50000);
+        usleep(500000);
         for (int i = 0; i < 30; i++){  
           draw_line(p1.x,p1.y,p2.x+i,p2.y+i,&green);    // Baling2
         }
@@ -385,15 +399,15 @@ int main () {
         
         
 		for (int i = 0; i < pp.size()-1; i++) {
-			draw_line(pp[i].x, pp[i].y, pp[i+1].x, pp[i+1].y, &black);
+			draw_line(trimResult[i].x, trimResult[i].y, trimResult[i+1].x, trimResult[i+1].y, &black);
 		}
         //usleep(50000);
-		draw_line(pp[pp.size()-1].x,pp[pp.size()-1].y,pp[0].x,pp[0].y,&black);
-		p2 = scalePoint(p1,p2,1.1);
-        fillPlane = scalePoint(p1,fillPlane,1.1);
-        fillPlane2 = scalePoint(p1,fillPlane2,1.1);
+		draw_line(trimResult[pp.size()-1].x,trimResult[pp.size()-1].y,trimResult[0].x,trimResult[0].y,&black);
+		// p2 = scalePoint(p1,p2,1.1);
+        // fillPlane = scalePoint(p1,fillPlane,1.1);
+        // fillPlane2 = scalePoint(p1,fillPlane2,1.1);
 		p2 = rotasi(p1,p2,degreeToRad(20));
-		scaleBanyak(p1, pp, 1.1, pp.size());
+		//scaleBanyak(p1, trimResult, 1.1, pp.size());
         for (int i = 0; i < pp.size(); i++) {
             pp[i].x += 10;
         }
@@ -404,44 +418,44 @@ int main () {
 		loop++;
 	}
 
-    while (1) {
-		for (int i = 0; i < pp.size()-1; i++) {
-			draw_line(pp[i].x, pp[i].y, pp[i+1].x, pp[i+1].y, &white);
-		}
-		draw_line(pp[pp.size()-1].x,pp[pp.size()-1].y,pp[0].x,pp[0].y,&white);
-		draw_dot(p1.x,p1.y,&black);
-        fil(p1.x,p1.y,0,&green);
-		fil(fillPlane.x,fillPlane.y,0,&green);
-        fil(fillPlane2.x,fillPlane2.y,0,&green);
-		for (int i = 0; i < 30; i++){  
-          draw_line(p1.x,p1.y,p2.x+i,p2.y+i,&white);    // Baling2
-        }
+    // while (1) {
+	// 	for (int i = 0; i < pp.size()-1; i++) {
+	// 		draw_line(pp[i].x, pp[i].y, pp[i+1].x, pp[i+1].y, &white);
+	// 	}
+	// 	draw_line(pp[pp.size()-1].x,pp[pp.size()-1].y,pp[0].x,pp[0].y,&white);
+	// 	draw_dot(p1.x,p1.y,&black);
+    //     fil(p1.x,p1.y,0,&green);
+	// 	fil(fillPlane.x,fillPlane.y,0,&green);
+    //     fil(fillPlane2.x,fillPlane2.y,0,&green);
+	// 	for (int i = 0; i < 30; i++){  
+    //       draw_line(p1.x,p1.y,p2.x+i,p2.y+i,&white);    // Baling2
+    //     }
         
-        if (loop == 10) break;
-		// clear screen mini
-        usleep(50000);
-        for (int i = 0; i < 30; i++){  
-          draw_line(p1.x,p1.y,p2.x+i,p2.y+i,&green);    // Baling2
-        }
-        if (p2.y > p1.y){
-            clear_screen(0,pp[3].y,1366,p2.y+100,&black);
-        } else {
-            clear_screen(0,p2.y+100,1366,pp[8].y,&black);
-        } 
+    //     if (loop == 10) break;
+	// 	// clear screen mini
+    //     usleep(50000);
+    //     for (int i = 0; i < 30; i++){  
+    //       draw_line(p1.x,p1.y,p2.x+i,p2.y+i,&green);    // Baling2
+    //     }
+    //     if (p2.y > p1.y){
+    //         clear_screen(0,pp[3].y,1366,p2.y+100,&black);
+    //     } else {
+    //         clear_screen(0,p2.y+100,1366,pp[8].y,&black);
+    //     } 
         
         
-		for (int i = 0; i < pp.size()-1; i++) {
-			draw_line(pp[i].x, pp[i].y, pp[i+1].x, pp[i+1].y, &black);
-		}
-        //usleep(50000);
-		draw_line(pp[pp.size()-1].x,pp[pp.size()-1].y,pp[0].x,pp[0].y,&black);
-		p2 = scalePoint(p1,p2,0.9);
-        fillPlane = scalePoint(p1,fillPlane,0.9);
-        fillPlane2 = scalePoint(p1,fillPlane2,0.9);
-		p2 = rotasi(p1,p2,degreeToRad(20));
-		scaleBanyak(p1, pp, 0.9, pp.size());
-		loop--;
-	}
+	// 	for (int i = 0; i < pp.size()-1; i++) {
+	// 		draw_line(pp[i].x, pp[i].y, pp[i+1].x, pp[i+1].y, &black);
+	// 	}
+    //     //usleep(50000);
+	// 	draw_line(pp[pp.size()-1].x,pp[pp.size()-1].y,pp[0].x,pp[0].y,&black);
+	// 	p2 = scalePoint(p1,p2,0.9);
+    //     fillPlane = scalePoint(p1,fillPlane,0.9);
+    //     fillPlane2 = scalePoint(p1,fillPlane2,0.9);
+	// 	p2 = rotasi(p1,p2,degreeToRad(20));
+	// 	scaleBanyak(p1, pp, 0.9, pp.size());
+	// 	loop--;
+	// }
     increment++;
 }
 

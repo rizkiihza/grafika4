@@ -1,4 +1,6 @@
 #include "point_warna.h"
+#include <vector>
+#include <cstdio>
 
 #define CHECK_BIT(var,pos) ((var) & (1<<(pos)))
 
@@ -8,48 +10,48 @@ typedef struct{
 } viewport;
 
 //Mengisi nilai xmax xmin ymax ymin sebuah viewport
-void initialize(viewport view){
+void initialize(viewport* view){
 	double xmax,xmin,ymax,ymin;
-	xmax = view.p1.x;
-	xmin = view.p1.x;
-	ymax = view.p1.y;
-	ymin = view.p2.y;
-	if(view.p2.x >= xmax){
-		xmax = view.p2.x;
+	xmax = view->p1.x;
+	xmin = view->p1.x;
+	ymax = view->p1.y;
+	ymin = view->p1.y;
+	if(view->p2.x >= xmax){
+		xmax = view->p2.x;
 	}
-	if(view.p2.x < xmin){
-		xmin = view.p2.x;
+	if(view->p2.x < xmin){
+		xmin = view->p2.x;
 	}
-	if(view.p3.x >= xmax){
-		xmax = view.p3.x;
+	if(view->p3.x >= xmax){
+		xmax = view->p3.x;
 	}
-	if(view.p3.x < xmin){
-		xmin = view.p3.x;
+	if(view->p3.x < xmin){
+		xmin = view->p3.x;
 	}
-	if(view.p4.x >= xmax){
-		xmax = view.p4.x;
+	if(view->p4.x >= xmax){
+		xmax = view->p4.x;
 	}
-	if(view.p4.x < xmin){
-		xmin = view.p4.x;
+	if(view->p4.x < xmin){
+		xmin = view->p4.x;
 	}
 	
-	if(view.p2.y >= ymax){
-		ymax = view.p2.y;
+	if(view->p2.y >= ymax){
+		ymax = view->p2.y;
 	}
-	if(view.p2.y < ymin){
-		ymin = view.p2.y;
+	if(view->p2.y < ymin){
+		ymin = view->p2.y;
 	}
-	if(view.p3.y >= ymax){
-		ymax = view.p3.y;
+	if(view->p3.y >= ymax){
+		ymax = view->p3.y;
 	}
-	if(view.p3.y < ymin){
-		ymin = view.p3.y;
+	if(view->p3.y < ymin){
+		ymin = view->p3.y;
 	}
-	if(view.p4.y >= ymax){
-		ymax = view.p4.y;
+	if(view->p4.y >= ymax){
+		ymax = view->p4.y;
 	}
-	if(view.p4.y < ymin){
-		ymin = view.p4.y;
+	if(view->p4.y < ymin){
+		ymin = view->p4.y;
 	}
 }
 //Mengecek posisi titik terhadap viewport. Jika pos = 0 maka titik berada dalam viewport 
@@ -232,8 +234,8 @@ void trimLineYMax(viewport view, point p1, point p2,point *np1,point *np2, int *
 // ArrNodes adalah Array yang berisi titik sebelum di trim, nArrNodes adalah Array berisi titik setelah dilakukan trim, N adalah jumlah titik awal.
 // ArrNodes[0] harus == ArrNodes[n] (contoh A-B-C-A akan membentuk segitiga)
 // Baru sama XMin
-void trimPolygon(viewport view, point *ArrNodes, point *nArrNodes, int *n){
-	int total = *n;
+void trimPolygon(viewport view, vector<point> ArrNodes, point *nArrNodes, int n){
+	int total = n;
 	int found = 0;
 	point temp;
 	point np1, np2;
@@ -267,4 +269,7 @@ void trimPolygon(viewport view, point *ArrNodes, point *nArrNodes, int *n){
 			}
 		}
 	}
+	// for (int i = 0; i < total; i++) {
+	// 	printf("%f %f, %f %f\n",ArrNodes[i].x, ArrNodes[i].y, nArrNodes[i].x, nArrNodes[i].y);
+	// }
 }
