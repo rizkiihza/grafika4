@@ -238,7 +238,7 @@ void trimLineYMax(viewport view, point p1, point p2,point *np1,point *np2, int *
 // ArrNodes adalah Array yang berisi titik sebelum di trim, nArrNodes adalah Array berisi titik setelah dilakukan trim, N adalah jumlah titik awal.
 // ArrNodes[0] harus == ArrNodes[n] (contoh A-B-C-A akan membentuk segitiga)
 // Baru sama XMin
-void trimPolygon(viewport view, vector<point> ArrNodes, point *nArrNodes, int n){
+void trimPolygon(viewport view, vector<point> ArrNodes, vector<point> &nArrNodes, int n){
 	int total = n;
 	int found = 0;
 	point temp;
@@ -283,6 +283,7 @@ void trimPolygon(viewport view, vector<point> ArrNodes, point *nArrNodes, int n)
 			}
 		}
 	}
+	nArrNodes.resize(count);
 	// for (int i = 0; i < total; i++) {
 	// 	printf("%f %f, %f %f\n",ArrNodes[i].x, ArrNodes[i].y, nArrNodes[i].x, nArrNodes[i].y);
 	// }

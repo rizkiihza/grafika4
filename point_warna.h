@@ -2,7 +2,7 @@
 #define POINT_WARNA_H
 
 typedef struct {
-    int r, g, b, a;
+    char r, g, b, a;
 } color;
 
 typedef struct{
