@@ -1,8 +1,12 @@
 #include "point_warna.h"
 #include <vector>
 #include <cstdio>
+#include <bitset>
 
-#define CHECK_BIT(var,pos) ((var) & (1<<(pos)))
+int CHECK_BIT(int var,int pos){
+	std::bitset<4> bi(var);
+	return bi[pos-1];
+}
 
 typedef struct{
 	point p1,p2,p3,p4;
@@ -76,6 +80,7 @@ int pointPos(viewport view, point p){
 void trimLineXMin(viewport view, point p1, point p2,point *np1,point *np2, int *stat){
 	int pos1 = pointPos(view,p1);
 	int pos2 = pointPos(view,p2);
+	//printf("%d %d\n",(CHECK_BIT(pos1,3)),pos1);
 	if((CHECK_BIT(pos1,4))&&(!CHECK_BIT(pos2,4))){
 		np2->x = p2.x;
 		np2->y = p2.y;
@@ -83,7 +88,7 @@ void trimLineXMin(viewport view, point p1, point p2,point *np1,point *np2, int *
 		
 		float grad = (p2.y - p1.y) / (p2.x - p1.x);
 		float c = p2.y - (grad*p2.x);
-		np1->y =  (double)(grad*view.xmin) +  (double)(c);
+		np1->y =  (grad*view.xmin) +  (c);
 		*stat = 1;
 		
 	} else if ((!CHECK_BIT(pos1,4))&&(CHECK_BIT(pos2,4))){
@@ -94,7 +99,7 @@ void trimLineXMin(viewport view, point p1, point p2,point *np1,point *np2, int *
 		float grad = (p2.y - p1.y) / (p2.x - p1.x);
 		float c = p2.y - (grad*p2.x);
 		np2->y =  (double)(grad*view.xmin) +  (double)(c);
-		*stat = 1;
+		*stat = 2;
 		
 	} else if ((!CHECK_BIT(pos1,4))&&(!CHECK_BIT(pos2,4))){
 		np2->x = p2.x;
@@ -252,11 +257,14 @@ void trimPolygon(viewport view, vector<point> ArrNodes, point *nArrNodes, int n)
 				count++;
 				nArrNodes[count] = np1;
 				nArrNodes[count+1] = np2;
+				found = 0;
 				count++;
 			}else{
 				nArrNodes[count] = np1;
-				nArrNodes[count] = np2;
+				nArrNodes[count+1] = np2;
 				temp = np1;
+				count++;
+				found = 1;
 			}
 			
 		}else if (stat == 2){
@@ -265,6 +273,13 @@ void trimPolygon(viewport view, vector<point> ArrNodes, point *nArrNodes, int n)
 				nArrNodes[count+1] = np2;
 				nArrNodes[count+2] = temp;
 				count += 2;
+				found = 0;
+			}else{
+				nArrNodes[count] = np1;
+				nArrNodes[count+1] = np2;
+				temp = np1;
+				count++;
+				found = 1;
 			}
 		}
 	}
