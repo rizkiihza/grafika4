@@ -11,47 +11,46 @@ typedef struct{
 
 //Mengisi nilai xmax xmin ymax ymin sebuah viewport
 void initialize(viewport* view){
-	double xmax,xmin,ymax,ymin;
-	xmax = view->p1.x;
-	xmin = view->p1.x;
-	ymax = view->p1.y;
-	ymin = view->p1.y;
-	if(view->p2.x >= xmax){
-		xmax = view->p2.x;
+	view->xmax = view->p1.x;
+	view->xmin = view->p1.x;
+	view->ymax = view->p1.y;
+	view->ymin = view->p1.y;
+	if(view->p2.x >= view->xmax){
+		view->xmax = view->p2.x;
 	}
-	if(view->p2.x < xmin){
-		xmin = view->p2.x;
+	if(view->p2.x < view->xmin){
+		view->xmin = view->p2.x;
 	}
-	if(view->p3.x >= xmax){
-		xmax = view->p3.x;
+	if(view->p3.x >= view->xmax){
+		view->xmax = view->p3.x;
 	}
-	if(view->p3.x < xmin){
-		xmin = view->p3.x;
+	if(view->p3.x < view->xmin){
+		view->xmin = view->p3.x;
 	}
-	if(view->p4.x >= xmax){
-		xmax = view->p4.x;
+	if(view->p4.x >= view->xmax){
+		view->xmax = view->p4.x;
 	}
-	if(view->p4.x < xmin){
-		xmin = view->p4.x;
+	if(view->p4.x < view->xmin){
+		view->xmin = view->p4.x;
 	}
 	
-	if(view->p2.y >= ymax){
-		ymax = view->p2.y;
+	if(view->p2.y >= view->ymax){
+		view->ymax = view->p2.y;
 	}
-	if(view->p2.y < ymin){
-		ymin = view->p2.y;
+	if(view->p2.y < view->ymin){
+		view->ymin = view->p2.y;
 	}
-	if(view->p3.y >= ymax){
-		ymax = view->p3.y;
+	if(view->p3.y >= view->ymax){
+		view->ymax = view->p3.y;
 	}
-	if(view->p3.y < ymin){
-		ymin = view->p3.y;
+	if(view->p3.y < view->ymin){
+		view->ymin = view->p3.y;
 	}
-	if(view->p4.y >= ymax){
-		ymax = view->p4.y;
+	if(view->p4.y >= view->ymax){
+		view->ymax = view->p4.y;
 	}
-	if(view->p4.y < ymin){
-		ymin = view->p4.y;
+	if(view->p4.y < view->ymin){
+		view->ymin = view->p4.y;
 	}
 }
 //Mengecek posisi titik terhadap viewport. Jika pos = 0 maka titik berada dalam viewport 

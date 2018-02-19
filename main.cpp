@@ -384,6 +384,12 @@ int main () {
 		for (int i = 0; i < 30; i++){  
           draw_line(p1.x,p1.y,p2.x+i,p2.y+i,&white);    // Baling2
         }
+
+        // replace
+        clear_screen(0,0,view.xmin,700,&black);
+        // clear_screen(view.xmax,0,1366,700,&black);
+        // clear_screen(view.xmin,0,view.xmax,view.ymin,&black);
+        // clear_screen(view.xmin,view.ymax,view.xmax,700,&black);
         
         if (loop == 20) break;
 		// clear screen mini
@@ -409,12 +415,12 @@ int main () {
 		p2 = rotasi(p1,p2,degreeToRad(20));
 		//scaleBanyak(p1, trimResult, 1.1, pp.size());
         for (int i = 0; i < pp.size(); i++) {
-            pp[i].x += 10;
+            pp[i].x -= 30;
         }
-        p1.x += 10;
-        p2.x += 10;
-        fillPlane.x += 10;
-        fillPlane2.x += 10;
+        p1.x -= 30;
+        p2.x -= 30;
+        fillPlane.x -= 30;
+        fillPlane2.x -= 30;
 		loop++;
 	}
 
