@@ -25,6 +25,7 @@ vector<point> trimResultXmax(100);
 vector<point> trimResultXmin(100);
 vector<point> trimResultYmax(100);
 vector<point> trimResultYmin(100);
+vector<pair<point,char> > colorTupleList;
 int layarx = 1366;
 int layary = 700;
 char *fbp = 0;
@@ -211,7 +212,7 @@ void fil(int x,int y,char prev, color &desired, color &replaced){
 	}
 }
 
-void insertToVector(string nama_file) {
+void insertToVector(vector<point> &insertedVector, string nama_file, point shift) {
 	
 	FILE* charmap;
 
@@ -229,22 +230,34 @@ void insertToVector(string nama_file) {
 		int x,y;
 		fscanf(charmap, "%d  %d", &x, &y);
 		//printf("%d %d ", x, y);
-		tempCharPoint.x = x+650;
-		tempCharPoint.y = y+350;
-		pp.push_back(tempCharPoint);
+		tempCharPoint.x = x+shift.x;
+		tempCharPoint.y = y+shift.y;
+		insertedVector.push_back(tempCharPoint);
 		//printf("%d %d\n", charpoints[k].absis, charpoints[k].ordinat);
 	}
-    pp.push_back(pp[0]);
+    insertedVector.push_back(insertedVector[0]);
 	int jumlah_loop_warna;
-	int x,y;
-	fscanf(charmap, "%d %d", &x, &y);
-	fillPlane.x = x+650;
-	fillPlane.y = y+350;
-    fscanf(charmap, "%d %d", &x, &y);
-	fillPlane2.x = x+650;
-	fillPlane2.y = y+350;
+	int xx,yy, numColour;
+    char c;
+    fscanf(charmap, "%d", &numColour);
+    for (int i = 0; i < numColour; i++) {
+        fscanf(charmap, "%d %d %c", &xx, &yy , &c);
+        point tempPoint;
+        tempPoint.x = xx + shift.x;
+        tempPoint.y = yy + shift.y;
+        pair<point, char> tempPair(tempPoint,c);
+        colorTupleList.push_back(tempPair);
+    }
 	fclose;
 }
+
+void fillPolygon(pair<point,char> p, color &replaced) {
+    if (p.second == 'g') {
+        fil(p.first.x,p.first.y,0,green,replaced);
+        printf("color %f %f\n",p.first.x,p.first.y);
+    }
+}
+
 
 int main () {
     point p1, p2;
@@ -316,7 +329,7 @@ int main () {
 	p2.y = 300;
 	
 	point ptemp;
-	insertToVector("pesawat_tampak_depan.txt");
+	insertToVector(pp,"pesawat_tampak_depan.txt",p1);
 	int loop = 0;
     int increment = 0;
     // initialize viewport
@@ -378,11 +391,16 @@ int main () {
         draw_line(pv3, pv4, &white);
         draw_line(pv4, pv1, &white);
         draw_dot(p1.x,p1.y,&black);
-        if (pointPos(view,p1) == 0) {
-            fil(p1.x,p1.y,0,green, black);
+        
+        for (int i = 0; i < colorTupleList.size(); i++) {
+            if (pointPos(view,colorTupleList[i].first) == 0) {
+                fillPolygon(colorTupleList[i],black);
+            }
+        }
+            //fil(p1.x,p1.y,0,green, black);
             // fil(fillPlane.x,fillPlane.y,0,green,black);
             // fil(fillPlane2.x,fillPlane2.y,0,green,black);
-        }
+        
 		
 		// for (int i = 0; i < 30; i++){  
         //   draw_line(p1.x,p1.y,p2.x+i,p2.y+i,&white);    // Baling2
@@ -415,6 +433,10 @@ int main () {
         for (int i = 0; i < pp.size(); i++) {
             pp[i].x -= 5;
             pp[i].y -= 5;
+        }
+        for (int i = 0; i < colorTupleList.size(); i++) {
+            colorTupleList[i].first.x -= 5;
+            colorTupleList[i].first.y -= 5;
         }
         p1.x -= 5;
         p1.y -= 5;
