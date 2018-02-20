@@ -351,14 +351,15 @@ int main () {
         draw_line(trimResult[i], trimResult[i+1], &green);
     }
 
+    int terminate = 0;
     // while (increment < 2){
-    while (1) {
+    while (!terminate) {
         for (int i = 0;i < pp.size();i++){
             printf("%f %f\n",pp[i].x,pp[i].y);
         }
         printf("Number of Point Before :%d\n",pp.size());
         printf("+++++++++++++++++++++++\n");
-        trimPolygon(view,pp,trimResult,pp.size());
+        //trimPolygon(view,pp,trimResult,pp.size());
         int test = trimResult.size();
 		for (int i = 0; i < trimResult.size()-1; i++) {
 			draw_line(trimResult[i], trimResult[i+1], &white);
@@ -385,7 +386,45 @@ int main () {
         
         
 		// // clear screen mini
-        usleep(500000);
+        // usleep(500000);
+        system ("/bin/stty raw");
+        char cin = ' ';
+        do {
+            cin = getchar();
+            
+        } while ((cin != 'w') && (cin != 'q') && (cin != 'a') && (cin != 's') && (cin != 'd'));
+        if (cin == 'q') {
+            terminate = 1;
+        } else if (cin == 'd') {
+            pv1.x += 10;
+            pv2.x += 10;
+            pv3.x += 10;
+            pv4.x += 10;
+            view.xmin += 10;
+            view.xmax += 10;
+        } else if (cin == 'a') {
+            pv1.x -= 10;
+            pv2.x -= 10;
+            pv3.x -= 10;
+            pv4.x -= 10;
+            view.xmin -= 10;
+            view.xmax -= 10;
+        } else if (cin == 'w') {
+            pv1.y -= 10;
+            pv2.y -= 10;
+            pv3.y -= 10;
+            pv4.y -= 10;
+            view.ymin -= 10;
+            view.ymax -= 10;
+        } else if (cin == 's') {
+            pv1.y += 10;
+            pv2.y += 10;
+            pv3.y += 10;
+            pv4.y += 10;
+            view.ymin += 10;
+            view.ymax += 10;
+        }
+        system ("/bin/stty cooked");
         // for (int i = 0; i < 30; i++){  
         //   draw_line(p1.x,p1.y,p2.x+i,p2.y+i,&green);    // Baling2
         // }
@@ -407,12 +446,7 @@ int main () {
         // // fillPlane2 = scalePoint(p1,fillPlane2,1.1);
 		// p2 = rotasi(p1,p2,degreeToRad(20));
 		//scaleBanyak(p1, trimResult, 1.1, pp.size());
-        pv1.x += 30;
-        pv2.x += 30;
-        pv3.x += 30;
-        pv4.x += 30;
-        view.xmin += 30;
-        view.xmax += 30;
+        
 		loop++;
         if (loop == 20) break;
 	}

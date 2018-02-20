@@ -366,9 +366,9 @@ int main () {
         //printf("%f %f\n",result[i].x, result[i].y);
         draw_line(trimResultXmin[i], trimResultXmin[i+1], &green);
     }
-
+    int terminate = 0;
     while (increment < 2){
-    while (1) {
+    while (!terminate) {
         for (int i = 0;i < pp.size();i++){
             printf("%f %f\n",pp[i].x,pp[i].y);
         }
@@ -397,9 +397,10 @@ int main () {
                 fillPolygon(colorTupleList[i],black);
             }
         }
-            //fil(p1.x,p1.y,0,green, black);
-            // fil(fillPlane.x,fillPlane.y,0,green,black);
-            // fil(fillPlane2.x,fillPlane2.y,0,green,black);
+       
+        // fil(p1.x,p1.y,0,green, black);
+        // fil(fillPlane.x,fillPlane.y,0,green,black);
+        // fil(fillPlane2.x,fillPlane2.y,0,green,black);
         
 		
 		// for (int i = 0; i < 30; i++){  
@@ -408,7 +409,7 @@ int main () {
         
         // if (loop == 20) break;
 		// // clear screen mini
-        usleep(500000);
+        // usleep(500000);
         // for (int i = 0; i < 30; i++){  
         //   draw_line(p1.x,p1.y,p2.x+i,p2.y+i,&green);    // Baling2
         // }
