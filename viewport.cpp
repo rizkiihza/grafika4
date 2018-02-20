@@ -246,7 +246,7 @@ void trimPolygon(viewport view, vector<point> ArrNodes, vector<point> &nArrNodes
 	int count = 0;
 	int stat;
 	//Trim terhadap Xmin
-	for (int i = 0; (i+1)< total; i++){
+	for (int i = 0; i < (total-1); i++){
 		trimLineXMin(view,ArrNodes[i],ArrNodes[i+1],&np1,&np2,&stat);
 		if(stat == 0){
 			nArrNodes[count] = np1;
@@ -258,7 +258,7 @@ void trimPolygon(viewport view, vector<point> ArrNodes, vector<point> &nArrNodes
 				nArrNodes[count] = np1;
 				nArrNodes[count+1] = np2;
 				found = 0;
-				count++;
+				count ++;
 			}else{
 				nArrNodes[count] = np1;
 				nArrNodes[count+1] = np2;
@@ -272,18 +272,18 @@ void trimPolygon(viewport view, vector<point> ArrNodes, vector<point> &nArrNodes
 				nArrNodes[count] = np1;
 				nArrNodes[count+1] = np2;
 				nArrNodes[count+2] = temp;
-				count += 2;
+				count += 2;;
 				found = 0;
 			}else{
 				nArrNodes[count] = np1;
 				nArrNodes[count+1] = np2;
-				temp = np1;
+				temp = np2;
 				count++;
 				found = 1;
 			}
 		}
 	}
-	nArrNodes.resize(count);
+	nArrNodes.resize(count+1);
 	// for (int i = 0; i < total; i++) {
 	// 	printf("%f %f, %f %f\n",ArrNodes[i].x, ArrNodes[i].y, nArrNodes[i].x, nArrNodes[i].y);
 	// }

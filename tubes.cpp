@@ -351,7 +351,7 @@ int main () {
         draw_line(trimResult[i], trimResult[i+1], &green);
     }
 
-    while (increment < 2){
+    // while (increment < 2){
     while (1) {
         for (int i = 0;i < pp.size();i++){
             printf("%f %f\n",pp[i].x,pp[i].y);
@@ -383,13 +383,13 @@ int main () {
         //   draw_line(p1.x,p1.y,p2.x+i,p2.y+i,&white);    // Baling2
         // }
         
-        // if (loop == 20) break;
+        
 		// // clear screen mini
         usleep(500000);
         // for (int i = 0; i < 30; i++){  
         //   draw_line(p1.x,p1.y,p2.x+i,p2.y+i,&green);    // Baling2
         // }
-        clear_screen(view.xmin,view.ymin,view.xmax,view.ymax,&black);
+        clear_screen(view.xmin,view.ymin,view.xmax+1,view.ymax+1,&black);
         // if (p2.y > p1.y){
             
         // } else {
@@ -407,14 +407,14 @@ int main () {
         // // fillPlane2 = scalePoint(p1,fillPlane2,1.1);
 		// p2 = rotasi(p1,p2,degreeToRad(20));
 		//scaleBanyak(p1, trimResult, 1.1, pp.size());
-        for (int i = 0; i < pp.size(); i++) {
-            pp[i].x -= 10;
-        }
-        p1.x -= 10;
-        p2.x -= 10;
-        fillPlane.x -= 10;
-        fillPlane2.x -= 10;
+        pv1.x += 30;
+        pv2.x += 30;
+        pv3.x += 30;
+        pv4.x += 30;
+        view.xmin += 30;
+        view.xmax += 30;
 		loop++;
+        if (loop == 20) break;
 	}
 
     // while (1) {
@@ -455,8 +455,8 @@ int main () {
 	// 	scaleBanyak(p1, pp, 0.9, pp.size());
 	// 	loop--;
 	// }
-    increment++;
-    }
+    // increment++;
+    // }
 
     return 0;
 }
