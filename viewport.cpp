@@ -138,7 +138,7 @@ void trimLineXMax(viewport view, point p1, point p2,point *np1,point *np2, int *
 		float grad = (p2.y - p1.y) / (p2.x - p1.x);
 		float c = p2.y - (grad*p2.x);
 		np2->y =  (double)(grad*view.xmax) +  (double)(c);
-		*stat = 1;
+		*stat = 2;
 		
 	} else if ((!CHECK_BIT(pos1,3))&&(!CHECK_BIT(pos2,3))){
 		np2->x = p2.x;
@@ -177,7 +177,7 @@ void trimLineYMin(viewport view, point p1, point p2,point *np1,point *np2, int *
 		float grad = (p2.y - p1.y) / (p2.x - p1.x);
 		float c = p2.y - (grad*p2.x);
 		np1->x = (double)(view.ymin / grad) - (double) (c);
-		*stat = 1;
+		*stat = 2;
 		
 	} else if ((!CHECK_BIT(pos1,2))&&(!CHECK_BIT(pos2,2))){
 		np2->x = p2.x;
@@ -216,7 +216,7 @@ void trimLineYMax(viewport view, point p1, point p2,point *np1,point *np2, int *
 		float grad = (p2.y - p1.y) / (p2.x - p1.x);
 		float c = p2.y - (grad*p2.x);
 		np1->x = (double)(view.ymax / grad) - (double) (c);
-		*stat = 1;
+		*stat = 2;
 		
 	} else if ((!CHECK_BIT(pos1,1))&&(!CHECK_BIT(pos2,1))){
 		np2->x = p2.x;
