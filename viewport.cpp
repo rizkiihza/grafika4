@@ -238,7 +238,7 @@ void trimLineYMax(viewport view, point p1, point p2,point *np1,point *np2, int *
 // ArrNodes adalah Array yang berisi titik sebelum di trim, nArrNodes adalah Array berisi titik setelah dilakukan trim, N adalah jumlah titik awal.
 // ArrNodes[0] harus == ArrNodes[n] (contoh A-B-C-A akan membentuk segitiga)
 // Baru sama XMin
-void trimPolygon(viewport view, vector<point> ArrNodes, vector<point> &nArrNodes, int n){
+void trimPolygonXMin(viewport view, vector<point> ArrNodes, vector<point> &nArrNodes, int n){
 	int total = n;
 	int found = 0;
 	point temp;
@@ -278,6 +278,159 @@ void trimPolygon(viewport view, vector<point> ArrNodes, vector<point> &nArrNodes
 				nArrNodes[count] = np1;
 				nArrNodes[count+1] = np2;
 				temp = np2;
+				count++;
+				found = 1;
+			}
+		}
+	}
+	nArrNodes.resize(count+1);
+	// for (int i = 0; i < total; i++) {
+	// 	printf("%f %f, %f %f\n",ArrNodes[i].x, ArrNodes[i].y, nArrNodes[i].x, nArrNodes[i].y);
+	// }
+}
+
+void trimPolygonXMax(viewport view, vector<point> ArrNodes, vector<point> &nArrNodes, int n){
+	int total = n;
+	int found = 0;
+	point temp;
+	point np1, np2;
+	int count = 0;
+	int stat;
+	//Trim terhadap Xmin
+	for (int i = 0; (i+1)< total; i++){
+		trimLineXMax(view,ArrNodes[i],ArrNodes[i+1],&np1,&np2,&stat);
+		if(stat == 0){
+			nArrNodes[count] = np1;
+			nArrNodes[count+1] = np2;
+			count++;
+		}else if (stat == 1){
+			if(found == 1){
+				count++;
+				nArrNodes[count] = np1;
+				nArrNodes[count+1] = np2;
+				found = 0;
+				count++;
+			}else{
+				nArrNodes[count] = np1;
+				nArrNodes[count+1] = np2;
+				temp = np1;
+				count++;
+				found = 1;
+			}
+			
+		}else if (stat == 2){
+			if(found == 1){
+				nArrNodes[count] = np1;
+				nArrNodes[count+1] = np2;
+				nArrNodes[count+2] = temp;
+				count += 2;
+				found = 0;
+			}else{
+				nArrNodes[count] = np1;
+				nArrNodes[count+1] = np2;
+				temp = np1;
+				count++;
+				found = 1;
+			}
+		}
+	}
+	nArrNodes.resize(count+1);
+	// for (int i = 0; i < total; i++) {
+	// 	printf("%f %f, %f %f\n",ArrNodes[i].x, ArrNodes[i].y, nArrNodes[i].x, nArrNodes[i].y);
+	// }
+}
+
+void trimPolygonYMin(viewport view, vector<point> ArrNodes, vector<point> &nArrNodes, int n){
+	int total = n;
+	int found = 0;
+	point temp;
+	point np1, np2;
+	int count = 0;
+	int stat;
+	//Trim terhadap Xmin
+	for (int i = 0; (i+1)< total; i++){
+		trimLineYMin(view,ArrNodes[i],ArrNodes[i+1],&np1,&np2,&stat);
+		if(stat == 0){
+			nArrNodes[count] = np1;
+			nArrNodes[count+1] = np2;
+			count++;
+		}else if (stat == 1){
+			if(found == 1){
+				count++;
+				nArrNodes[count] = np1;
+				nArrNodes[count+1] = np2;
+				found = 0;
+				count++;
+			}else{
+				nArrNodes[count] = np1;
+				nArrNodes[count+1] = np2;
+				temp = np1;
+				count++;
+				found = 1;
+			}
+			
+		}else if (stat == 2){
+			if(found == 1){
+				nArrNodes[count] = np1;
+				nArrNodes[count+1] = np2;
+				nArrNodes[count+2] = temp;
+				count += 2;
+				found = 0;
+			}else{
+				nArrNodes[count] = np1;
+				nArrNodes[count+1] = np2;
+				temp = np1;
+				count++;
+				found = 1;
+			}
+		}
+	}
+	nArrNodes.resize(count+1);
+	// for (int i = 0; i < total; i++) {
+	// 	printf("%f %f, %f %f\n",ArrNodes[i].x, ArrNodes[i].y, nArrNodes[i].x, nArrNodes[i].y);
+	// }
+}
+
+void trimPolygonYMax(viewport view, vector<point> ArrNodes, vector<point> &nArrNodes, int n){
+	int total = n;
+	int found = 0;
+	point temp;
+	point np1, np2;
+	int count = 0;
+	int stat;
+	//Trim terhadap Xmin
+	for (int i = 0; (i+1)< total; i++){
+		trimLineYMax(view,ArrNodes[i],ArrNodes[i+1],&np1,&np2,&stat);
+		if(stat == 0){
+			nArrNodes[count] = np1;
+			nArrNodes[count+1] = np2;
+			count++;
+		}else if (stat == 1){
+			if(found == 1){
+				count++;
+				nArrNodes[count] = np1;
+				nArrNodes[count+1] = np2;
+				found = 0;
+				count++;
+			}else{
+				nArrNodes[count] = np1;
+				nArrNodes[count+1] = np2;
+				temp = np1;
+				count++;
+				found = 1;
+			}
+			
+		}else if (stat == 2){
+			if(found == 1){
+				nArrNodes[count] = np1;
+				nArrNodes[count+1] = np2;
+				nArrNodes[count+2] = temp;
+				count += 2;
+				found = 0;
+			}else{
+				nArrNodes[count] = np1;
+				nArrNodes[count+1] = np2;
+				temp = np1;
 				count++;
 				found = 1;
 			}
