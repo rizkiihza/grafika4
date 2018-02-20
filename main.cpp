@@ -21,7 +21,10 @@ struct fb_fix_screeninfo finfo;
 vector<point> pp;
 point fillPlane, fillPlane2;
 vector<point> fillvector;
-vector<point> trimResult(100);
+vector<point> trimResultXmax(100);
+vector<point> trimResultXmin(100);
+vector<point> trimResultYmax(100);
+vector<point> trimResultYmin(100);
 int layarx = 1366;
 int layary = 700;
 char *fbp = 0;
@@ -318,8 +321,8 @@ int main () {
     int increment = 0;
     // initialize viewport
     point pv1 = {x = 300, y = 200};
-    point pv2 = {x = 700, y = 200};
-    point pv3 = {x = 700, y = 500};
+    point pv2 = {x = 600, y = 200};
+    point pv3 = {x = 600, y = 500};
     point pv4 = {x = 300, y = 500};
     viewport view;
     view.p1 = pv1;
@@ -346,9 +349,9 @@ int main () {
 
     // trimPolygon(view,input,trimResult,input.size()-1);
     
-    for (int i = 0; i < trimResult.size(); i++) {
+    for (int i = 0; i < trimResultXmin.size(); i++) {
         //printf("%f %f\n",result[i].x, result[i].y);
-        draw_line(trimResult[i], trimResult[i+1], &green);
+        draw_line(trimResultXmin[i], trimResultXmin[i+1], &green);
     }
 
     while (increment < 2){
@@ -358,14 +361,16 @@ int main () {
         }
         printf("Number of Point Before :%d\n",pp.size());
         printf("+++++++++++++++++++++++\n");
-        trimPolygon(view,pp,trimResult,pp.size());
-        int test = trimResult.size();
-		for (int i = 0; i < trimResult.size()-1; i++) {
-			draw_line(trimResult[i], trimResult[i+1], &white);
-            printf("%f %f\n",trimResult[i].x,trimResult[i].y);
+        trimPolygonXMin(view,pp,trimResultXmin,pp.size());
+        trimPolygonXMax(view,trimResultXmin,trimResultXmax,trimResultXmin.size());
+        trimPolygonYMin(view,trimResultXmax,trimResultYmin,trimResultXmax.size());
+        int test = trimResultXmin.size();
+		for (int i = 0; i < trimResultYmin.size()-1; i++) {
+			draw_line(trimResultYmin[i], trimResultYmin[i+1], &white);
+            printf("%f %f\n",trimResultXmax[i].x,trimResultXmax[i].y);
         }
-        printf("%f %f\n",trimResult[test-1].x,trimResult[test-1].y);
-        printf("Number of Point After :%d\n",trimResult.size());
+        printf("%f %f\n",trimResultXmin[test-1].x,trimResultXmax[test-1].y);
+        printf("Number of Point After :%d\n",trimResultXmax.size());
         printf("====================================\n");
         usleep(5000);
 		draw_line(pv1, pv2,&white);
@@ -375,8 +380,8 @@ int main () {
         draw_dot(p1.x,p1.y,&black);
         if (pointPos(view,p1) == 0) {
             fil(p1.x,p1.y,0,green, black);
-            fil(fillPlane.x,fillPlane.y,0,green,black);
-            fil(fillPlane2.x,fillPlane2.y,0,green,black);
+            // fil(fillPlane.x,fillPlane.y,0,green,black);
+            // fil(fillPlane2.x,fillPlane2.y,0,green,black);
         }
 		
 		// for (int i = 0; i < 30; i++){  
@@ -408,12 +413,14 @@ int main () {
 		// p2 = rotasi(p1,p2,degreeToRad(20));
 		//scaleBanyak(p1, trimResult, 1.1, pp.size());
         for (int i = 0; i < pp.size(); i++) {
-            pp[i].x -= 10;
+            pp[i].x -= 5;
+            pp[i].y -= 5;
         }
-        p1.x -= 10;
-        p2.x -= 10;
-        fillPlane.x -= 10;
-        fillPlane2.x -= 10;
+        p1.x -= 5;
+        p1.y -= 5;
+        p2.x -= 5;
+        fillPlane.x -= 5;
+        fillPlane2.x -= 5;
 		loop++;
 	}
 
