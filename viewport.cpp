@@ -283,7 +283,7 @@ void trimPolygonXMin(viewport view, vector<point> ArrNodes, vector<point> &nArrN
 			}
 		}
 	}
-	nArrNodes.resize(count);
+	nArrNodes.resize(count+1);
 	// for (int i = 0; i < total; i++) {
 	// 	printf("%f %f, %f %f\n",ArrNodes[i].x, ArrNodes[i].y, nArrNodes[i].x, nArrNodes[i].y);
 	// }
@@ -334,7 +334,7 @@ void trimPolygonXMax(viewport view, vector<point> ArrNodes, vector<point> &nArrN
 			}
 		}
 	}
-	nArrNodes.resize(count);
+	nArrNodes.resize(count+1);
 	// for (int i = 0; i < total; i++) {
 	// 	printf("%f %f, %f %f\n",ArrNodes[i].x, ArrNodes[i].y, nArrNodes[i].x, nArrNodes[i].y);
 	// }
@@ -385,7 +385,7 @@ void trimPolygonYMin(viewport view, vector<point> ArrNodes, vector<point> &nArrN
 			}
 		}
 	}
-	nArrNodes.resize(count);
+	nArrNodes.resize(count+1);
 	// for (int i = 0; i < total; i++) {
 	// 	printf("%f %f, %f %f\n",ArrNodes[i].x, ArrNodes[i].y, nArrNodes[i].x, nArrNodes[i].y);
 	// }
@@ -436,7 +436,7 @@ void trimPolygonYMax(viewport view, vector<point> ArrNodes, vector<point> &nArrN
 			}
 		}
 	}
-	nArrNodes.resize(count);
+	nArrNodes.resize(count+1);
 	// for (int i = 0; i < total; i++) {
 	// 	printf("%f %f, %f %f\n",ArrNodes[i].x, ArrNodes[i].y, nArrNodes[i].x, nArrNodes[i].y);
 	// }
