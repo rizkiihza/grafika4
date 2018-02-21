@@ -49,6 +49,7 @@ int line_sect(point x0, point x1, point y0, point y1, point& res)
  
 	res.x = y0.x + dyx * dy.x;
 	res.y = y0.y + dyx * dy.y;
+
 	return 1;
 }
 
@@ -103,10 +104,12 @@ void poly_edge_clip(poly sub, point x0, point x1, int left, poly res)
 		if (side0 + side1 == 0 && side0)
 			if (line_sect(x0, x1, v0, v1, tmp)){
 				poly_append(res, &tmp);
+
 			}
 		if (i == sub->len - 1) break;
 		if (side1 != -left){
 			poly_append(res, &v1);
+
 		};
 		v0 = v1;
 		side0 = side1;
@@ -121,8 +124,7 @@ poly poly_clip(poly sub, poly clip)
 	int dir = poly_winding(clip);
 	poly_edge_clip(sub, *(clip->v + clip->len - 1), *(clip->v), dir, p2);
 	// looping setiap sisi dari clip
-	//for (i = 0; i < clip->len - 1; i++) {
-	for (i = 1; i < 2; i++) {
+	for (i = 0; i < clip->len - 1; i++) {
 		// menukar hasil clip menjadi inputan selanjutnya
 		tmp = p2; p2 = p1; p1 = tmp;
 		// kalo titik di inputan sudah tidak ada, break

@@ -218,7 +218,6 @@ void insertToVector(vector<point> &insertedVector, string nama_file, point shift
 	charmap = fopen(nama_file.c_str(), "r");
 
 	int jumlah_loop;
-	//printf("Jumlah loop = %d\n", jumlah_loop);
 	point tempCharPoint;
 		
 	int i = 0;
@@ -253,7 +252,6 @@ void insertToVector(vector<point> &insertedVector, string nama_file, point shift
 void fillPolygon(pair<point,char> p, color &replaced) {
     if (p.second == 'g') {
         fil(p.first.x,p.first.y,0,green,replaced);
-        printf("color %f %f\n",p.first.x,p.first.y);
     }
 }
 
@@ -315,7 +313,7 @@ int main () {
 		exit(4);
 	}
 	printf("The framebuffer device was mapped to memory successfully.\n");
-	//clear_screen(0,0,1366, 700, &black);
+	clear_screen(0,0,1366, 700, &black);
 	
 
 	//pivot 650,350
@@ -329,7 +327,7 @@ int main () {
 
     // initialize viewport
     // urutan c[] tidak boleh diubah -> urutan algo sutherland
-    point c[] = {{300,200}, {700,200}, {700,500}, {300,500}};
+    point c[] = {{300,300}, {700,300}, {700,500}, {300,500}};
 
     #define clen (4) /*ntar hapus */
 
@@ -371,6 +369,14 @@ int main () {
 
         draw_line(res->v[res->len -1], res->v[0], &white);
 
+        // Bagian pewarnaan
+        for (int i = 0; i < colorTupleList.size(); i++) {
+            if (pointPos(view,colorTupleList[i].first) == 0) {
+                fillPolygon(colorTupleList[i],black);
+            }
+        }
+        // Akhir pewarnaan
+
         // draw_dot(p1.x,p1.y,&black);
         // if (pointPos(view,p1) == 0) {
         //     fil(p1.x,p1.y,0,green, black);
@@ -393,6 +399,7 @@ int main () {
             cin = getchar();
             
         } while ((cin != 'w') && (cin != 'q') && (cin != 'a') && (cin != 's') && (cin != 'd'));
+        //system ("/bin/stty erase");
         system ("/bin/stty cooked");
         clear_screen(view.xmin,view.ymin,view.xmax+1,view.ymax+1,&black);
         if (cin == 'q') {
