@@ -57,6 +57,16 @@ void initialize(viewport* view){
 		view->ymin = view->p4.y;
 	}
 }
+
+void translasiX(viewport &view, int x){
+	view.xmax += x;
+	view.xmin += x;
+}
+
+void translasiY(viewport &view, int y){
+	view.ymax += y;
+	view.ymin += y;
+}
 //Mengecek posisi titik terhadap viewport. Jika pos = 0 maka titik berada dalam viewport 
 int pointPos(viewport view, point p){
 	int pos = 0;

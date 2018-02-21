@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <unistd.h>
+#include <iostream>
 #include <fcntl.h>
 #include <linux/fb.h>
 #include <sys/mman.h>
@@ -13,23 +14,28 @@
 #include <string.h>
 #include <algorithm>
 #include "viewport.cpp"
+#include "clip.cpp"
+
+// Subject View for Viewport
+vec_t s[10] = {};
+vec_t s2[3] = {};
 
 // inisialisasi struct
-
 struct fb_var_screeninfo vinfo;
 struct fb_fix_screeninfo finfo;
 vector<point> pp;
 point fillPlane, fillPlane2;
 vector<point> fillvector;
 vector<point> trimResult(100);
+vector<pair<point,char> > colorTupleList;
 int layarx = 1366;
 int layary = 700;
 char *fbp = 0;
 
 color white = { 255, 255, 255, 0 };
 color black = {	0, 0, 0, 0 };
-color green = {	0, 255, 255, 0 };
-color blue = { 0, 255, 0, 0 };
+color green = {	0, 255, 0, 0 };
+color blue = { 0, 0, 255, 0 };
 
 float degreeToRad(float degree) {
     return (degree * M_PI / 180);
@@ -170,11 +176,8 @@ int draw_line(point p1, point p2, color* c) {
 }
 
 void clear_screen(int xx, int yy, int width, int height, color *desired) {
-    
-    for(int x=xx; x<width; x++)
-    {
-        for(int y=0; y<height; y++)
-        {
+    for(int x=xx; x<width; x++) {
+        for(int y=yy; y<height; y++) {
             long int position = (x + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) +
                (y + vinfo.yoffset) * finfo.line_length;
             *(fbp + position) = desired->b;
@@ -208,7 +211,7 @@ void fil(int x,int y,char prev, color &desired, color &replaced){
 	}
 }
 
-void insertToVector(string nama_file) {
+void insertToVector(vector<point> &insertedVector, string nama_file, point shift) {
 	
 	FILE* charmap;
 
@@ -226,21 +229,32 @@ void insertToVector(string nama_file) {
 		int x,y;
 		fscanf(charmap, "%d  %d", &x, &y);
 		//printf("%d %d ", x, y);
-		tempCharPoint.x = x+650;
-		tempCharPoint.y = y+350;
-		pp.push_back(tempCharPoint);
+		tempCharPoint.x = x+shift.x;
+		tempCharPoint.y = y+shift.y;
+		insertedVector.push_back(tempCharPoint);
 		//printf("%d %d\n", charpoints[k].absis, charpoints[k].ordinat);
 	}
-    pp.push_back(pp[0]);
+    insertedVector.push_back(insertedVector[0]);
 	int jumlah_loop_warna;
-	int x,y;
-	fscanf(charmap, "%d %d", &x, &y);
-	fillPlane.x = x+650;
-	fillPlane.y = y+350;
-    fscanf(charmap, "%d %d", &x, &y);
-	fillPlane2.x = x+650;
-	fillPlane2.y = y+350;
+	int xx,yy, numColour;
+    char c;
+    fscanf(charmap, "%d", &numColour);
+    for (int i = 0; i < numColour; i++) {
+        fscanf(charmap, "%d %d %c", &xx, &yy , &c);
+        point tempPoint;
+        tempPoint.x = xx + shift.x;
+        tempPoint.y = yy + shift.y;
+        pair<point, char> tempPair(tempPoint,c);
+        colorTupleList.push_back(tempPair);
+    }
 	fclose;
+}
+
+void fillPolygon(pair<point,char> p, color &replaced) {
+    if (p.second == 'g') {
+        fil(p.first.x,p.first.y,0,green,replaced);
+        printf("color %f %f\n",p.first.x,p.first.y);
+    }
 }
 
 int main () {
@@ -251,8 +265,6 @@ int main () {
     p2.y = 200;
     point res;
     res = rotasi(p1,p2,(degreeToRad(45)));
-    //printf("%f", sin());
-    printf("%f %f\n", res.x, res.y);
 
     // test rotasi banyak
     point p[2];
@@ -261,8 +273,6 @@ int main () {
     p[1].x = 0;
     p[1].y = 10;
     //rotasiBanyak(p1, p, degreeToRad(45), 2);
-    printf("%f %f\n", p[0].x, p[0].y);
-    printf("%f %f\n", p[1].x, p[1].y);
 
     int fbfd = 0;
 
@@ -313,72 +323,60 @@ int main () {
 	p2.y = 300;
 	
 	point ptemp;
-	insertToVector("pesawat_tampak_depan.txt");
+	insertToVector(pp,"pesawat_tampak_depan.txt",p1);
 	int loop = 0;
     int increment = 0;
+
     // initialize viewport
-    point pv1 = {x = 300, y = 200};
-    point pv2 = {x = 700, y = 200};
-    point pv3 = {x = 700, y = 500};
-    point pv4 = {x = 300, y = 500};
+    // urutan c[] tidak boleh diubah -> urutan algo sutherland
+    point c[] = {{300,200}, {700,200}, {700,500}, {300,500}};
+
+    #define clen (4) /*ntar hapus */
+
     viewport view;
-    view.p1 = pv1;
-    view.p2 = pv2;
-    view.p3 = pv3;
-    view.p4 = pv4;
+    view.p1 = c[0];
+    view.p2 = c[1];
+    view.p3 = c[2];
+    view.p4 = c[3];
     initialize(&view);
-	// draw_line(pv1.x,pv1.y,pv2.x,pv2.y,&white);
-    //     draw_line(pv2.x,pv2.y,pv3.x,pv3.y,&white);
-    //     draw_line(pv3.x,pv3.y,pv4.x,pv4.y,&white);
-    //     draw_line(pv4.x,pv4.y,pv1.x,pv1.y,&white);
-
-    
-    // point ptest1 = {x = 200, y = 300};
-    // point ptest2 = {x = 500, y = 400};
-    // point ptest3 = {x = 250, y = 400};
-    // point res1, res2, res3;
-
-    // vector<point> input;
-    // input.push_back(ptest1);
-    // input.push_back(ptest2);
-    // input.push_back(ptest3);
-    // input.push_back(ptest1);
-
-    // trimPolygon(view,input,trimResult,input.size()-1);
-    
-    for (int i = 0; i < trimResult.size(); i++) {
-        //printf("%f %f\n",result[i].x, result[i].y);
-        draw_line(trimResult[i], trimResult[i+1], &green);
-    }
 
     int terminate = 0;
     // while (increment < 2){
     while (!terminate) {
-        for (int i = 0;i < pp.size();i++){
-            printf("%f %f\n",pp[i].x,pp[i].y);
-        }
-        printf("Number of Point Before :%d\n",pp.size());
-        printf("+++++++++++++++++++++++\n");
         //trimPolygon(view,pp,trimResult,pp.size());
         int test = trimResult.size();
-		for (int i = 0; i < trimResult.size()-1; i++) {
-			draw_line(trimResult[i], trimResult[i+1], &white);
-            printf("%f %f\n",trimResult[i].x,trimResult[i].y);
+        // usleep(5000);
+		draw_line(c[0], c[1],&white);
+        draw_line(c[1], c[2],&white);
+        draw_line(c[2], c[3],&white);
+        draw_line(c[3], c[0],&white);
+
+        // --------------------------- Start Clip Plane ---------------------------
+        poly_t clipper = {clen, 0, c};
+        poly_t subject = {pp.size(), 0, &pp[0]};
+
+        // for (int i = 0; i < subject.len -1; i++) {
+        //     draw_line(subject.v[i], subject.v[i+1], &white);
+        // }
+
+        poly res = poly_clip(&subject, &clipper);
+        if(res->len > 0){
+            for (int i = 0; i < res->len -1; i++) {
+                draw_line(res->v[i], res->v[i+1], &white);
+                //printf("%f %f -> %f %f\n",res->v[i].x,res->v[i].y,res->v[i+1].x,res->v[i+1].y);
+            }
+        }else {
+            //cout << "\n" << i << ") " << "0" << "\n";
         }
-        printf("%f %f\n",trimResult[test-1].x,trimResult[test-1].y);
-        printf("Number of Point After :%d\n",trimResult.size());
-        printf("====================================\n");
-        usleep(5000);
-		draw_line(pv1, pv2,&white);
-        draw_line(pv2, pv3, &white);
-        draw_line(pv3, pv4, &white);
-        draw_line(pv4, pv1, &white);
-        draw_dot(p1.x,p1.y,&black);
-        if (pointPos(view,p1) == 0) {
-            fil(p1.x,p1.y,0,green, black);
-            fil(fillPlane.x,fillPlane.y,0,green,black);
-            fil(fillPlane2.x,fillPlane2.y,0,green,black);
-        }
+
+        draw_line(res->v[res->len -1], res->v[0], &white);
+
+        // draw_dot(p1.x,p1.y,&black);
+        // if (pointPos(view,p1) == 0) {
+        //     fil(p1.x,p1.y,0,green, black);
+        //     fil(fillPlane.x,fillPlane.y,0,green,black);
+        //     fil(fillPlane2.x,fillPlane2.y,0,green,black);
+        // }
 		
 		// for (int i = 0; i < 30; i++){  
         //   draw_line(p1.x,p1.y,p2.x+i,p2.y+i,&white);    // Baling2
@@ -387,108 +385,45 @@ int main () {
         
 		// // clear screen mini
         // usleep(500000);
+
+        // Terima input dari layar << FUNC
         system ("/bin/stty raw");
         char cin = ' ';
         do {
             cin = getchar();
             
         } while ((cin != 'w') && (cin != 'q') && (cin != 'a') && (cin != 's') && (cin != 'd'));
+        system ("/bin/stty cooked");
+        clear_screen(view.xmin,view.ymin,view.xmax+1,view.ymax+1,&black);
         if (cin == 'q') {
             terminate = 1;
         } else if (cin == 'd') {
-            pv1.x += 10;
-            pv2.x += 10;
-            pv3.x += 10;
-            pv4.x += 10;
-            view.xmin += 10;
-            view.xmax += 10;
+            for (int i = 0; i < clen; i++) {
+                c[i].x += 10;
+            }
+            translasiX(view,10);
         } else if (cin == 'a') {
-            pv1.x -= 10;
-            pv2.x -= 10;
-            pv3.x -= 10;
-            pv4.x -= 10;
-            view.xmin -= 10;
-            view.xmax -= 10;
+            for (int i = 0; i < clen; i++) {
+                c[i].x -= 10;
+            }
+            translasiX(view,-10);
         } else if (cin == 'w') {
-            pv1.y -= 10;
-            pv2.y -= 10;
-            pv3.y -= 10;
-            pv4.y -= 10;
-            view.ymin -= 10;
-            view.ymax -= 10;
+            for (int i = 0; i < clen; i++) {
+                c[i].y -= 10;
+            }
+            translasiY(view,-10);
         } else if (cin == 's') {
-            pv1.y += 10;
-            pv2.y += 10;
-            pv3.y += 10;
-            pv4.y += 10;
-            view.ymin += 10;
-            view.ymax += 10;
+            for (int i = 0; i < clen; i++) {
+                c[i].y += 10;
+            }
+            translasiY(view,10);
         }
-        system ("/bin/stty cooked");
-        // for (int i = 0; i < 30; i++){  
-        //   draw_line(p1.x,p1.y,p2.x+i,p2.y+i,&green);    // Baling2
-        // }
-        clear_screen(view.xmin,view.ymin,view.xmax+1,view.ymax+1,&black);
-        // if (p2.y > p1.y){
-            
-        // } else {
-        //     clear_screen(0,p2.y+100,1366,p1.y+30,&black);
-        // } 
         
-        
-		// for (int i = 0; i < pp.size()-1; i++) {
-		// 	draw_line(trimResult[i].x, trimResult[i].y, trimResult[i+1].x, trimResult[i+1].y, &black);
-		// }
-        // //usleep(50000);
-		// draw_line(trimResult[pp.size()-1].x,trimResult[pp.size()-1].y,trimResult[0].x,trimResult[0].y,&black);
-		// // p2 = scalePoint(p1,p2,1.1);
-        // // fillPlane = scalePoint(p1,fillPlane,1.1);
-        // // fillPlane2 = scalePoint(p1,fillPlane2,1.1);
-		// p2 = rotasi(p1,p2,degreeToRad(20));
-		//scaleBanyak(p1, trimResult, 1.1, pp.size());
         
 		loop++;
-        if (loop == 20) break;
+        //if (loop == 20) break;
 	}
 
-    // while (1) {
-	// 	for (int i = 0; i < pp.size()-1; i++) {
-	// 		draw_line(pp[i].x, pp[i].y, pp[i+1].x, pp[i+1].y, &white);
-	// 	}
-	// 	draw_line(pp[pp.size()-1].x,pp[pp.size()-1].y,pp[0].x,pp[0].y,&white);
-	// 	draw_dot(p1.x,p1.y,&black);
-    //     fil(p1.x,p1.y,0,&green);
-	// 	fil(fillPlane.x,fillPlane.y,0,&green);
-    //     fil(fillPlane2.x,fillPlane2.y,0,&green);
-	// 	for (int i = 0; i < 30; i++){  
-    //       draw_line(p1.x,p1.y,p2.x+i,p2.y+i,&white);    // Baling2
-    //     }
-        
-    //     if (loop == 10) break;
-	// 	// clear screen mini
-    //     usleep(50000);
-    //     for (int i = 0; i < 30; i++){  
-    //       draw_line(p1.x,p1.y,p2.x+i,p2.y+i,&green);    // Baling2
-    //     }
-    //     if (p2.y > p1.y){
-    //         clear_screen(0,pp[3].y,1366,p2.y+100,&black);
-    //     } else {
-    //         clear_screen(0,p2.y+100,1366,pp[8].y,&black);
-    //     } 
-        
-        
-	// 	for (int i = 0; i < pp.size()-1; i++) {
-	// 		draw_line(pp[i].x, pp[i].y, pp[i+1].x, pp[i+1].y, &black);
-	// 	}
-    //     //usleep(50000);
-	// 	draw_line(pp[pp.size()-1].x,pp[pp.size()-1].y,pp[0].x,pp[0].y,&black);
-	// 	p2 = scalePoint(p1,p2,0.9);
-    //     fillPlane = scalePoint(p1,fillPlane,0.9);
-    //     fillPlane2 = scalePoint(p1,fillPlane2,0.9);
-	// 	p2 = rotasi(p1,p2,degreeToRad(20));
-	// 	scaleBanyak(p1, pp, 0.9, pp.size());
-	// 	loop--;
-	// }
     // increment++;
     // }
 

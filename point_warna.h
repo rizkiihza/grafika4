@@ -10,4 +10,6 @@ typedef struct{
     double y;
 } point;
 
+typedef point *pointerPoint;
+
 #endif

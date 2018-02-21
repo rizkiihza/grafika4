@@ -297,10 +297,6 @@ int main () {
     p1.y = 350;
     p2.x = 0;
     p2.y = 200;
-    point res;
-    res = rotasi(p1,p2,(degreeToRad(45)));
-    //printf("%f", sin());
-    printf("%f %f\n", res.x, res.y);
 
     // test rotasi banyak
     point p[2];
@@ -366,13 +362,13 @@ int main () {
     int increment = 0;
 
     int i;
-    vec_t c[] = {{300,50}, {1000,50}, {1000,600}, {300,600}};
-    #define clen (sizeof(c)/sizeof(vec_t))
+    vec_t c[] = {{300,50}, {700,50}, {700,600}, {300,600}};
+    #define clen (4)
 
-    while (increment < 2){
-    while (1) {
+    // while (increment < 2){
+    // while (1) {
 
-        for(int i = 0; i < clen; i++){
+        for(int i = 0; i < clen - 1; i++){
             draw_line(c[i].x, c[i].y , c[i+1].x, c[i+1].y , &white);
         }
         draw_line(c[clen-1].x, c[clen-1].y , c[0].x, c[0].y , &white);
@@ -398,7 +394,7 @@ int main () {
                 draw_line(res->v[i].x, res->v[i].y,res->v[i+1].x, res->v[i+1].y, &white);
             }
         }else {
-            cout << "\n" << i << ") " << "0" << "\n";
+            // cout << "\n" << i << ") " << "0" << "\n";
         }
 
         draw_line(res->v[res->len -1].x, res->v[res->len -1].y, res->v[0].x, res->v[0].y, &white);
@@ -427,31 +423,17 @@ int main () {
         for (int i = 0; i < res2->len-1; i++){  
             // Baling2
             draw_line(res2->v[i].x + 0.5, res2->v[i].y + 0.5, res2->v[i+1].x + 0.5, res2->v[i+1].y + 0.5, &white);
-            cout << "\n\n\n\n" << i <<") " << (int) (res2->v[i].x + 0.5) << " , " << (int) (res2->v[i].y + 0.5) << "\n";
+            // cout << "\n\n\n\n" << i <<") " << (int) (res2->v[i].x + 0.5) << " , " << (int) (res2->v[i].y + 0.5) << "\n";
         }
 
         draw_line(res2->v[2].x + 0.5, res2->v[2].y + 0.5, res2->v[0].x + 0.5, res2->v[0].y + 0.5, &white);
 
         // ---------------------------------------------------------------------
         
-        if (loop == 30) break;
+        // if (loop == 30) break;
         usleep(50000);
 
         // ---------------------------- Clear Screen Mini ----------------------
-        for (int i = 0; i < 30; i++){  
-            draw_line(p1.x,p1.y,p2.x+i,p2.y+i,&black);      // Baling2
-        }
-        if (p2.y > p1.y){
-            clear_screen(0,p1.y-30,1366,p2.y+100,&black);
-        } else {
-            clear_screen(0,p2.y+100,1366,p1.y+30,&black);
-        } 
-        
-        
-		for (int i = 0; i < pp.size()-1; i++) {
-			draw_line(pp[i].x, pp[i].y, pp[i+1].x, pp[i+1].y, &black);
-		}
-        draw_line(pp[pp.size()-1].x,pp[pp.size()-1].y,pp[0].x,pp[0].y,&black);
         // ------------------------------- end clear --------------------------
 
         // ------------------------------- Scale - Rotation -------------------
@@ -468,9 +450,9 @@ int main () {
         fillPlane.x += 10;
         fillPlane2.x += 10;
         loop++;
-	}
-    increment++;
-}
+// 	}
+//     increment++;
+// }
 
     return 0;
 }

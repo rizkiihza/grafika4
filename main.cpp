@@ -14,6 +14,7 @@
 #include <algorithm>
 #include "viewport.cpp"
 
+
 // inisialisasi struct
 
 struct fb_var_screeninfo vinfo;
