@@ -328,8 +328,7 @@ int main () {
     // initialize viewport
     // urutan c[] tidak boleh diubah -> urutan algo sutherland
     point c[] = {{300,300}, {700,300}, {700,500}, {300,500}};
-
-    #define clen (4) /*ntar hapus */
+    char clen = 4;
 
     viewport view;
     view.p1 = c[0];
@@ -339,7 +338,6 @@ int main () {
     initialize(&view);
 
     int terminate = 0;
-    // while (increment < 2){
     while (!terminate) {
         //trimPolygon(view,pp,trimResult,pp.size());
         int test = trimResult.size();
@@ -363,11 +361,12 @@ int main () {
                 draw_line(res->v[i], res->v[i+1], &white);
                 //printf("%f %f -> %f %f\n",res->v[i].x,res->v[i].y,res->v[i+1].x,res->v[i+1].y);
             }
+            draw_line(res->v[res->len -1], res->v[0], &white);
         }else {
             //cout << "\n" << i << ") " << "0" << "\n";
         }
-
-        draw_line(res->v[res->len -1], res->v[0], &white);
+        
+        
 
         // Bagian pewarnaan
         for (int i = 0; i < colorTupleList.size(); i++) {
