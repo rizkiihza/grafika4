@@ -220,7 +220,6 @@ void insertToVector(vector<point> &insertedVector, string nama_file, point shift
 	for (int k = 0; k < jumlah_titik; k++) {
 		int x,y;
 		fscanf(charmap, "%d  %d", &x, &y);
-		//printf("%d %d ", x, y);
 		tempCharPoint.x = x+shift.x;
 		tempCharPoint.y = y+shift.y;
 		insertedVector.push_back(tempCharPoint);
