@@ -201,7 +201,7 @@ void clear_screen(int width, int height)
     }
 }
 
-void draw_circle(int pivX, int pivY, int curX, int curY){
+void draw_multi_dot(int pivX, int pivY, int curX, int curY){
 	draw_dot(pivX + curX, pivY + curY,&green);
 	draw_dot(pivX - curX, pivY + curY,&green);
     draw_dot(pivX + curX, pivY - curY,&green);
@@ -266,17 +266,18 @@ int main() {
 
 	FILE *charmap;
 
-	//baca map untuk pixel karakter
-	int pivX = (int)(vinfo.xres)/2;
-	int pivY = (int)(vinfo.yres)-400;
-	int r = 150;
+    // SETUP DRAW CIRCLE
+    int pivX = (int)(vinfo.xres)/2;
+    int pivY = (int)(vinfo.yres)-400;
+    int r = 150;
 
-	int curX = 0;
-	int curY = r;
-	
-	int Fe = (pivX+1)*(pivX+1) + (pivY)*(pivY) - r*r;
-	int Fse = (pivX+1)*(pivX+1) + (pivY-1)*(pivY-1) - r*r;
+    int curX = 0;
+    int curY = r;
+    
+    int Fe = (pivX+1)*(pivX+1) + (pivY)*(pivY) - r*r;
+    int Fse = (pivX+1)*(pivX+1) + (pivY-1)*(pivY-1) - r*r;
     int d = Fe + Fse;
+    // END SETUP DRAW CIRCLE
 
     while(1) {
         //menghitamkan layar
@@ -291,23 +292,25 @@ int main() {
             }
         }
 
-	    draw_circle(pivX,pivY,curX,curY);
-		
+	    // DRAW CIRCLE
+        draw_multi_dot(pivX,pivY,curX,curY);
+        
         while(curX <= curY){
-			if(d > 0){
-				curY--;
-				d = d + 4*(curX-curY) + 10;
-			}else{
-				d = d + 4*curX + 6;
-			}
-			curX++;
-			draw_circle(pivX,pivY,curX,curY);
-			std::cout << curX << "," << curY << "\n";
+            if(d > 0){
+                curY--;
+                d = d + 4*(curX-curY) + 10;
+            }else{
+                d = d + 4*curX + 6;
+            }
+            curX++;
+            draw_multi_dot(pivX,pivY,curX,curY);
+            std::cout << curX << "," << curY << "\n";
         }
 
         int d = Fe + Fse;
         curX = 0;
         curY = r;
+        // END DRAW CIRCLE
 	}
 
 	munmap(fbp, screensize);
