@@ -28,8 +28,8 @@ point fillPlane, fillPlane2;
 vector<point> fillvector;
 vector<point> trimResult(100);
 vector<pair<point,char> > colorTupleList;
-int layarx = 1366;
-int layary = 700;
+int layarx = 800;
+int layary = 600;
 char *fbp = 0;
 
 color white = { 255, 255, 255, 0 };
@@ -252,6 +252,8 @@ void insertToVector(vector<point> &insertedVector, string nama_file, point shift
 void fillPolygon(pair<point,char> p, color &replaced) {
     if (p.second == 'g') {
         fil(p.first.x,p.first.y,0,green,replaced);
+    } else if (p.second == 'w') {
+        fil(p.first.x,p.first.y,0,white,replaced);
     }
 }
 
@@ -313,7 +315,7 @@ int main () {
 		exit(4);
 	}
 	printf("The framebuffer device was mapped to memory successfully.\n");
-	clear_screen(0,0,1366, 700, &black);
+	clear_screen(0,0,800, 600, &black);
 	
 
 	//pivot 650,350
@@ -321,13 +323,13 @@ int main () {
 	p2.y = 300;
 	
 	point ptemp;
-	insertToVector(pp,"pesawat_tampak_depan.txt",p1);
+	insertToVector(pp,"Labtek6.txt",p1);
 	int loop = 0;
     int increment = 0;
 
     // initialize viewport
     // urutan c[] tidak boleh diubah -> urutan algo sutherland
-    point c[] = {{300,300}, {700,300}, {700,500}, {300,500}};
+    point c[] = {{100,100}, {700,100}, {700,500}, {100,500}};
     char clen = 4;
 
     viewport view;
@@ -376,63 +378,26 @@ int main () {
         }
         // Akhir pewarnaan
 
-        // draw_dot(p1.x,p1.y,&black);
-        // if (pointPos(view,p1) == 0) {
-        //     fil(p1.x,p1.y,0,green, black);
-        //     fil(fillPlane.x,fillPlane.y,0,green,black);
-        //     fil(fillPlane2.x,fillPlane2.y,0,green,black);
-        // }
-		
-		// for (int i = 0; i < 30; i++){  
-        //   draw_line(p1.x,p1.y,p2.x+i,p2.y+i,&white);    // Baling2
-        // }
-        
-        
-		// // clear screen mini
-        // usleep(500000);
-
         // Terima input dari layar << FUNC
-        system ("/bin/stty raw");
+        system ("/bin/stty raw -echo");
         char cin = ' ';
         do {
             cin = getchar();
             
         } while ((cin != 'w') && (cin != 'q') && (cin != 'a') && (cin != 's') && (cin != 'd'));
         //system ("/bin/stty erase");
-        system ("/bin/stty cooked");
+        system ("/bin/stty cooked echo");
         clear_screen(view.xmin,view.ymin,view.xmax+1,view.ymax+1,&black);
         if (cin == 'q') {
             terminate = 1;
-        } else if (cin == 'd') {
-            for (int i = 0; i < clen; i++) {
-                c[i].x += 10;
+        } else {
+            translasiBanyak(pp,cin,10);
+            for (int ite = 0; ite < colorTupleList.size(); ite++) {
+                translasi((colorTupleList[ite].first),cin,10);
             }
-            translasiX(view,10);
-        } else if (cin == 'a') {
-            for (int i = 0; i < clen; i++) {
-                c[i].x -= 10;
-            }
-            translasiX(view,-10);
-        } else if (cin == 'w') {
-            for (int i = 0; i < clen; i++) {
-                c[i].y -= 10;
-            }
-            translasiY(view,-10);
-        } else if (cin == 's') {
-            for (int i = 0; i < clen; i++) {
-                c[i].y += 10;
-            }
-            translasiY(view,10);
+            
         }
-        
-        
-		loop++;
-        //if (loop == 20) break;
 	}
-
-    // increment++;
-    // }
-
     return 0;
 }
 

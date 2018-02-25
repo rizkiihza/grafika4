@@ -3,6 +3,7 @@
         "math.h": "c",
         "initializer_list": "cpp",
         "bitset": "cpp",
-        "*.tcc": "cpp"
+        "*.tcc": "cpp",
+        "iostream": "cpp"
     }
 }
