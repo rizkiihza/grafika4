@@ -1,39 +1,30 @@
 #include "rotasi.h"
 #include "scaling.h"
 #include "point_warna.h"
-#include <stdio.h>
-#include <math.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <unistd.h>
+#include "clip.h"
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
 #include <iostream>
 #include <fcntl.h>
 #include <linux/fb.h>
 #include <sys/mman.h>
 #include <sys/ioctl.h>
-#include <string.h>
-#include <algorithm>
 #include <fstream>
-#include "viewport.cpp"
-#include "clip.cpp"
-
-// Subject View for Viewport
-vec_t s[10] = {};
-vec_t s2[3] = {};
+using namespace std;
 
 // inisialisasi struct
 struct fb_var_screeninfo vinfo;
 struct fb_fix_screeninfo finfo;
-vector<point> pp;
+
+// inisialisasi variabel
 vector<vector<point> > listPoint;
-point fillPlane, fillPlane2;
-vector<point> fillvector;
-vector<point> trimResult(100);
 vector<pair<point,char> > colorTupleList;
 int layarx = 800;
 int layary = 600;
 char *fbp = 0;
 
+// inisialisasi daftar warna
 color white = { 255, 255, 255, 0 };
 color black = {	0, 0, 0, 0 };
 color notSoBlack = {50,50,50,0};
@@ -226,7 +217,6 @@ void insertToVector(vector<point> &insertedVector, string nama_file, point shift
 	int i = 0;
 	int jumlah_titik;
 	fscanf(charmap, "%d", &jumlah_titik);
-	//printf("Jumlah titik pada loop %d = %d\n", current_loop, jumlah_titik);
 	for (int k = 0; k < jumlah_titik; k++) {
 		int x,y;
 		fscanf(charmap, "%d  %d", &x, &y);
@@ -234,7 +224,6 @@ void insertToVector(vector<point> &insertedVector, string nama_file, point shift
 		tempCharPoint.x = x+shift.x;
 		tempCharPoint.y = y+shift.y;
 		insertedVector.push_back(tempCharPoint);
-		//printf("%d %d\n", charpoints[k].absis, charpoints[k].ordinat);
 	}
     insertedVector.push_back(insertedVector[0]);
 	int jumlah_loop_warna;
@@ -261,11 +250,6 @@ void fillPolygon(pair<point,char> p, color &replaced) {
 }
 
 void addListPoint(string listPointFileName, point shift){
-    // FILE* charmap;
-
-	// charmap = fopen(listPointFileName.c_str(), "r");
-		
-	// int i = 0;
 	int jumlah_bidang;
     ifstream charmap;
     charmap.open("listPolygon.txt");
@@ -280,29 +264,38 @@ void addListPoint(string listPointFileName, point shift){
 	}
 }
 
+void moveViewport(int& terminate) {
+    system ("/bin/stty raw -echo");
+    char cin = ' ';
+    do {
+        cin = getchar();
+        
+    } while ((cin != 'w') && (cin != 'q') && (cin != 'a') && (cin != 's') && (cin != 'd'));
+    system ("/bin/stty cooked echo");
+    
+    if (cin == 'q') {
+        terminate = 1;
+    } else {
+        for (int ite = 0; ite < listPoint.size(); ite++) {
+            translasiBanyak(listPoint[ite],cin,10);
+        }
+        for (int ite = 0; ite < colorTupleList.size(); ite++) {
+            translasi((colorTupleList[ite].first),cin,10);
+        }
+        
+    }
+}
+
 int main () {
-    point p1, p2;
+    point p1; // p1 adalah pivot
     p1.x = 650;
     p1.y = 350;
-    p2.x = 0;
-    p2.y = 200;
-    point res;
-    res = rotasi(p1,p2,(degreeToRad(45)));
-
-    // test rotasi banyak
-    point p[2];
-    p[0].x = 10;
-    p[0].y = 0;
-    p[1].x = 0;
-    p[1].y = 10;
-    //rotasiBanyak(p1, p, degreeToRad(45), 2);
 
     int fbfd = 0;
 
 	long int screensize = 0;
 
   	int x = 0, y = 0;
-  	long int location = 0;
 
   	// Open the file for reading and writing
   	fbfd = open("/dev/fb0", O_RDWR);
@@ -333,22 +326,14 @@ int main () {
 	// Map the device to memory
 	fbp = (char *)mmap(0, screensize, PROT_READ | PROT_WRITE, MAP_SHARED,
 			fbfd, 0);
-	if ((int)fbp == -1) {
+	if (atoi(fbp) == -1) {
 		perror("Error: failed to map framebuffer device to memory");
 		exit(4);
 	}
 	printf("The framebuffer device was mapped to memory successfully.\n");
-	clear_screen(0,0,800, 600, &notSoBlack);
-	
 
-	//pivot 650,350
-	p2.x = 650;
-	p2.y = 300;
-	
-	point ptemp;
+	clear_screen(0,0,800, 600, &notSoBlack);
 	addListPoint("listPolygon.txt",p1);
-	int loop = 0;
-    int increment = 0;
 
     // initialize viewport
     // urutan c[] tidak boleh diubah -> urutan algo sutherland
@@ -365,9 +350,6 @@ int main () {
     int terminate = 0;
     while (!terminate) {
         clear_screen(view.xmin,view.ymin,view.xmax+1,view.ymax+1,&black);
-        //trimPolygon(view,pp,trimResult,pp.size());
-        int test = trimResult.size();
-        // usleep(5000);
 		draw_line(c[0], c[1],&white);
         draw_line(c[1], c[2],&white);
         draw_line(c[2], c[3],&white);
@@ -375,22 +357,15 @@ int main () {
 
         // --------------------------- Start Clip Plane ---------------------------
         poly_t clipper = {clen, 0, c};
-        
 
-        // for (int i = 0; i < subject.len -1; i++) {
-        //     draw_line(subject.v[i], subject.v[i+1], &white);
-        // }
         for (int listPolygonIte = 0; listPolygonIte < listPoint.size(); listPolygonIte++) {
             poly_t subject = {listPoint[listPolygonIte].size(), 0, &listPoint[listPolygonIte][0]};
             poly res = poly_clip(&subject, &clipper);
             if(res->len > 0){
                 for (int i = 0; i < res->len -1; i++) {
                     draw_line(res->v[i], res->v[i+1], &white);
-                    //printf("%f %f -> %f %f\n",res->v[i].x,res->v[i].y,res->v[i+1].x,res->v[i+1].y);
                 }
                 draw_line(res->v[res->len -1], res->v[0], &white);
-            }else {
-                //cout << "\n" << i << ") " << "0" << "\n";
             }
         }
         
@@ -403,26 +378,7 @@ int main () {
         }
         // Akhir pewarnaan
 
-        // Terima input dari layar << FUNC
-        system ("/bin/stty raw -echo");
-        char cin = ' ';
-        do {
-            cin = getchar();
-            
-        } while ((cin != 'w') && (cin != 'q') && (cin != 'a') && (cin != 's') && (cin != 'd'));
-        system ("/bin/stty cooked echo");
-        
-        if (cin == 'q') {
-            terminate = 1;
-        } else {
-            for (int ite = 0; ite < listPoint.size(); ite++) {
-                translasiBanyak(listPoint[ite],cin,10);
-            }
-            for (int ite = 0; ite < colorTupleList.size(); ite++) {
-                translasi((colorTupleList[ite].first),cin,10);
-            }
-            
-        }
+        moveViewport(terminate);
 	}
     return 0;
 }

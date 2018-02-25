@@ -2,9 +2,71 @@
 #include <iostream>
 #include <stdlib.h>
 #include <math.h>
+#include "clip.h"
 #include "point_warna.h"
- 
-typedef struct { double x, y; } vec_t, *vec;
+
+//Mengecek posisi titik terhadap viewport. Jika pos = 0 maka titik berada dalam viewport 
+int pointPos(viewport view, point p){
+	int pos = 0;
+	if (p.x < view.xmin){
+		pos += 8;
+	} else if (p.x > view.xmax){
+		pos += 4;
+	}
+	
+	if (p.y < view.ymin){
+		pos += 2;
+	} else if (p.y > view.ymax){
+		pos += 1;
+	}
+	
+	return pos;
+}
+
+//Mengisi nilai xmax xmin ymax ymin sebuah viewport
+void initialize(viewport* view){
+	view->xmax = view->p1.x;
+	view->xmin = view->p1.x;
+	view->ymax = view->p1.y;
+	view->ymin = view->p1.y;
+	if(view->p2.x >= view->xmax){
+		view->xmax = view->p2.x;
+	}
+	if(view->p2.x < view->xmin){
+		view->xmin = view->p2.x;
+	}
+	if(view->p3.x >= view->xmax){
+		view->xmax = view->p3.x;
+	}
+	if(view->p3.x < view->xmin){
+		view->xmin = view->p3.x;
+	}
+	if(view->p4.x >= view->xmax){
+		view->xmax = view->p4.x;
+	}
+	if(view->p4.x < view->xmin){
+		view->xmin = view->p4.x;
+	}
+	
+	if(view->p2.y >= view->ymax){
+		view->ymax = view->p2.y;
+	}
+	if(view->p2.y < view->ymin){
+		view->ymin = view->p2.y;
+	}
+	if(view->p3.y >= view->ymax){
+		view->ymax = view->p3.y;
+	}
+	if(view->p3.y < view->ymin){
+		view->ymin = view->p3.y;
+	}
+	if(view->p4.y >= view->ymax){
+		view->ymax = view->p4.y;
+	}
+	if(view->p4.y < view->ymin){
+		view->ymin = view->p4.y;
+	}
+}
  
 double dot(point a, point b)
 {
@@ -52,8 +114,6 @@ int line_sect(point x0, point x1, point y0, point y1, point& res)
 
 	return 1;
 }
-
-typedef struct { int len, alloc; point* v; } poly_t, *poly;
  
 poly poly_new()
 {
@@ -71,7 +131,7 @@ void poly_append(poly p, point* v)
 	if (p->len >= p->alloc) {
 		p->alloc *= 2;
 		if (!p->alloc) p->alloc = 4;
-		p->v = (point*)realloc(p->v, sizeof(vec_t) * p->alloc);
+		p->v = (point*)realloc(p->v, sizeof(point) * p->alloc);
 	}
 	p->v[p->len++] = *v;
 }
