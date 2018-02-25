@@ -13,6 +13,7 @@
 #include <sys/ioctl.h>
 #include <string.h>
 #include <algorithm>
+#include <fstream>
 #include "viewport.cpp"
 #include "clip.cpp"
 
@@ -24,6 +25,7 @@ vec_t s2[3] = {};
 struct fb_var_screeninfo vinfo;
 struct fb_fix_screeninfo finfo;
 vector<point> pp;
+vector<vector<point> > listPoint;
 point fillPlane, fillPlane2;
 vector<point> fillvector;
 vector<point> trimResult(100);
@@ -34,6 +36,7 @@ char *fbp = 0;
 
 color white = { 255, 255, 255, 0 };
 color black = {	0, 0, 0, 0 };
+color notSoBlack = {50,50,50,0};
 color green = {	0, 255, 0, 0 };
 color blue = { 0, 0, 255, 0 };
 
@@ -257,6 +260,26 @@ void fillPolygon(pair<point,char> p, color &replaced) {
     }
 }
 
+void addListPoint(string listPointFileName, point shift){
+    // FILE* charmap;
+
+	// charmap = fopen(listPointFileName.c_str(), "r");
+		
+	// int i = 0;
+	int jumlah_bidang;
+    ifstream charmap;
+    charmap.open("listPolygon.txt");
+	charmap >> jumlah_bidang;
+	for (int k = 0; k < jumlah_bidang; k++) {
+		int x,y;
+        string namaFile;
+		charmap >> namaFile;
+		vector<point> temp;
+        insertToVector(temp,namaFile,shift);
+        listPoint.push_back(temp);
+	}
+}
+
 int main () {
     point p1, p2;
     p1.x = 650;
@@ -315,7 +338,7 @@ int main () {
 		exit(4);
 	}
 	printf("The framebuffer device was mapped to memory successfully.\n");
-	clear_screen(0,0,800, 600, &black);
+	clear_screen(0,0,800, 600, &notSoBlack);
 	
 
 	//pivot 650,350
@@ -323,7 +346,7 @@ int main () {
 	p2.y = 300;
 	
 	point ptemp;
-	insertToVector(pp,"Labtek6.txt",p1);
+	addListPoint("listPolygon.txt",p1);
 	int loop = 0;
     int increment = 0;
 
@@ -341,6 +364,7 @@ int main () {
 
     int terminate = 0;
     while (!terminate) {
+        clear_screen(view.xmin,view.ymin,view.xmax+1,view.ymax+1,&black);
         //trimPolygon(view,pp,trimResult,pp.size());
         int test = trimResult.size();
         // usleep(5000);
@@ -351,23 +375,24 @@ int main () {
 
         // --------------------------- Start Clip Plane ---------------------------
         poly_t clipper = {clen, 0, c};
-        poly_t subject = {pp.size(), 0, &pp[0]};
+        
 
         // for (int i = 0; i < subject.len -1; i++) {
         //     draw_line(subject.v[i], subject.v[i+1], &white);
         // }
-
-        poly res = poly_clip(&subject, &clipper);
-        if(res->len > 0){
-            for (int i = 0; i < res->len -1; i++) {
-                draw_line(res->v[i], res->v[i+1], &white);
-                //printf("%f %f -> %f %f\n",res->v[i].x,res->v[i].y,res->v[i+1].x,res->v[i+1].y);
+        for (int listPolygonIte = 0; listPolygonIte < listPoint.size(); listPolygonIte++) {
+            poly_t subject = {listPoint[listPolygonIte].size(), 0, &listPoint[listPolygonIte][0]};
+            poly res = poly_clip(&subject, &clipper);
+            if(res->len > 0){
+                for (int i = 0; i < res->len -1; i++) {
+                    draw_line(res->v[i], res->v[i+1], &white);
+                    //printf("%f %f -> %f %f\n",res->v[i].x,res->v[i].y,res->v[i+1].x,res->v[i+1].y);
+                }
+                draw_line(res->v[res->len -1], res->v[0], &white);
+            }else {
+                //cout << "\n" << i << ") " << "0" << "\n";
             }
-            draw_line(res->v[res->len -1], res->v[0], &white);
-        }else {
-            //cout << "\n" << i << ") " << "0" << "\n";
         }
-        
         
 
         // Bagian pewarnaan
@@ -385,13 +410,14 @@ int main () {
             cin = getchar();
             
         } while ((cin != 'w') && (cin != 'q') && (cin != 'a') && (cin != 's') && (cin != 'd'));
-        //system ("/bin/stty erase");
         system ("/bin/stty cooked echo");
-        clear_screen(view.xmin,view.ymin,view.xmax+1,view.ymax+1,&black);
+        
         if (cin == 'q') {
             terminate = 1;
         } else {
-            translasiBanyak(pp,cin,10);
+            for (int ite = 0; ite < listPoint.size(); ite++) {
+                translasiBanyak(listPoint[ite],cin,10);
+            }
             for (int ite = 0; ite < colorTupleList.size(); ite++) {
                 translasi((colorTupleList[ite].first),cin,10);
             }
