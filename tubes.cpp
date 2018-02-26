@@ -245,6 +245,8 @@ void fillPolygon(pair<point,char> p, color &replaced) {
         fil(p.first.x,p.first.y,0,green,replaced);
     } else if (p.second == 'w') {
         fil(p.first.x,p.first.y,0,white,replaced);
+    } else if (p.second == 'b') {
+        fil(p.first.x,p.first.y,0,blue,replaced);
     }
 }
 
@@ -282,6 +284,16 @@ void moveViewport(int& terminate) {
             translasi((colorTupleList[ite].first),cin,10);
         }
         
+    }
+}
+
+void drawCircle(int r, point pivot, vector<point> &result) {
+    // ambil titik atas
+    point temp = {pivot.x, pivot.y - r};
+    result.push_back(temp);
+    for (int i = 0; i < 72; i++) {
+        temp = rotasi(pivot,temp,degreeToRad(5));
+        result.push_back(temp);
     }
 }
 
@@ -346,6 +358,12 @@ int main () {
     view.p4 = c[3];
     initialize(&view);
 
+    point pusatLingkaran = {650, 350};
+    vector<point> resultCircle;
+    drawCircle(30,pusatLingkaran,resultCircle);
+    listPoint.push_back(resultCircle);
+
+    
     int terminate = 0;
     while (!terminate) {
         clear_screen(view.xmin,view.ymin,view.xmax+1,view.ymax+1,&black);
@@ -353,7 +371,7 @@ int main () {
         draw_line(c[1], c[2],&white);
         draw_line(c[2], c[3],&white);
         draw_line(c[3], c[0],&white);
-
+        
         // --------------------------- Start Clip Plane ---------------------------
         poly_t clipper = {clen, 0, c};
 
@@ -368,7 +386,6 @@ int main () {
             }
         }
         
-
         // Bagian pewarnaan
         for (int i = 0; i < colorTupleList.size(); i++) {
             if (pointPos(view,colorTupleList[i].first) == 0) {
