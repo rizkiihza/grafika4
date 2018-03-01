@@ -20,6 +20,15 @@ struct fb_fix_screeninfo finfo;
 // inisialisasi variabel
 vector<vector<point> > listPoint;
 vector<pair<point,char> > colorTupleList;
+
+typedef struct {
+    point startPoint;
+    char direction; // wasd
+    int size;
+    vector<color> resColor;
+} memList;
+vector<memList> pointerMemList;
+point p1; // p1 adalah pivot
 int layarx = 800;
 int layary = 600;
 char *fbp = 0;
@@ -30,6 +39,32 @@ color black = {	0, 0, 0, 0 };
 color notSoBlack = {50,50,50,0};
 color green = {	0, 255, 0, 0 };
 color blue = { 0, 0, 255, 0 };
+
+
+
+
+void storeMemory(memList &entry) {
+    int addx = 0, addy = 0;
+    for (int i = 0; i < entry.size; i++) {
+        long int position = (entry.startPoint.x + addx + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) + (entry.startPoint.y + addy + vinfo.yoffset) * finfo.line_length;
+        color temp;
+        temp.b = *(fbp + position);
+        temp.g = *(fbp + position + 1);
+        temp.r = *(fbp + position + 2);
+        //cout << (int)(*(fbp + position)) << endl;
+        entry.resColor.push_back(temp);
+        if (entry.direction == 'w') {
+            addy--;
+        } else if (entry.direction == 's') {
+            addy++;
+        } else if (entry.direction == 'a') {
+            addx--;
+        } else if (entry.direction == 'd') {
+            addx++;
+        } 
+    }
+}
+
 
 float degreeToRad(float degree) {
     return (degree * M_PI / 180);
@@ -46,6 +81,7 @@ void draw_dot(int x, int y, color* c) {
         *(fbp + position + 1) = c->g;
         *(fbp + position + 2) = c->r;
         *(fbp + position + 3) = c->a;
+        //cout << (int)(*(fbp + position)) << endl;
     }
     else
     { //assume 16 bit color
@@ -55,6 +91,50 @@ void draw_dot(int x, int y, color* c) {
         unsigned short int t = r<<11 | g << 5 | b;
         *((unsigned short int*)(fbp + position)) = t;
     }
+}
+
+void draw_multi_dot(int pivX, int pivY, int curX, int curY, viewport v){
+    point cur;
+
+    cur.x = pivX + curX;
+    cur.y = pivY + curY;
+    if(pointPos(v,cur) == 0)
+        draw_dot(cur.x, cur.y,&green);
+
+    cur.x = pivX - curX;
+    cur.y = pivY + curY;
+    if(pointPos(v,cur) == 0)
+        draw_dot(cur.x, cur.y,&white);
+    
+    cur.x = pivX + curX;
+    cur.y = pivY - curY;
+    if(pointPos(v,cur) == 0)
+        draw_dot(cur.x, cur.y,&white);
+
+    cur.x = pivX - curX;
+    cur.y = pivY - curY;
+    if(pointPos(v,cur) == 0)
+        draw_dot(cur.x, cur.y,&white);
+    
+    cur.x = pivX - curY;
+    cur.y = pivY - curX;
+    if(pointPos(v,cur) == 0)
+        draw_dot(cur.x, cur.y,&white);
+    
+    cur.x = pivX + curY;
+    cur.y = pivY - curX;
+    if(pointPos(v,cur) == 0)
+        draw_dot(cur.x, cur.y,&white);
+    
+    cur.x = pivX - curY;
+    cur.y = pivY + curX;
+    if(pointPos(v,cur) == 0)
+        draw_dot(cur.x, cur.y,&white);
+    
+    cur.x = pivX + curY;
+    cur.y = pivY + curX;
+    if(pointPos(v,cur) == 0)
+       draw_dot(cur.x, cur.y,&white);
 }
 
 int draw_line(point p1, point p2, color* c) {
@@ -181,6 +261,47 @@ void clear_screen(int xx, int yy, int width, int height, color *desired) {
         }
     }
 }
+void redraw(vector<memList> &listEntry) {
+    for (int j = 0; j < listEntry.size(); j++) {
+        memList entry = listEntry[j];
+        int addx = 0, addy = 0;
+        for (int i = 0; i < entry.size; i++) {
+            long int position = (entry.startPoint.x + addx + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) + (entry.startPoint.y + addy + vinfo.yoffset) * finfo.line_length;
+            color temp = entry.resColor[i];
+            *(fbp + position) = temp.b;
+            *(fbp + position + 1) = temp.g;
+            *(fbp + position + 2) = temp.r;
+            
+            if (entry.direction == 'w') {
+                addy--;
+            } else if (entry.direction == 's') {
+                addy++;
+            } else if (entry.direction == 'a') {
+                addx--;
+            } else if (entry.direction == 'd') {
+                addx++;
+            } 
+        }
+    }
+}
+
+
+void movePointer(int& terminate) {
+    system ("/bin/stty raw -echo");
+    char cin = ' ';
+    do {
+        cin = getchar();
+        
+    } while ((cin != 'w') && (cin != 'q') && (cin != 'a') && (cin != 's') && (cin != 'd'));
+    system ("/bin/stty cooked echo");
+    
+    if (cin == 'q') {
+        terminate = 1;
+    } else {
+        // remove pointer yang ada
+            translasi(p1,cin,1);
+    }
+}
 
 void fil(int x,int y,char prev, color &desired, color &replaced){
     char tm = 255;
@@ -265,7 +386,10 @@ void addListPoint(string listPointFileName, point shift){
 	}
 }
 
-void moveViewport(int& terminate) {
+
+
+
+void moveViewport(int& terminate, memList &entry) {
     system ("/bin/stty raw -echo");
     char cin = ' ';
     do {
@@ -283,66 +407,41 @@ void moveViewport(int& terminate) {
         for (int ite = 0; ite < colorTupleList.size(); ite++) {
             translasi((colorTupleList[ite].first),cin,10);
         }
+        // redraw yg tadinya ditimpa
+        
+        translasi(p1,cin,10);
         
     }
 }
+
 
 void drawCircle(int r, point pivot, vector<point> &result) {
     // ambil titik atas
     point temp = {pivot.x, pivot.y - r};
     result.push_back(temp);
-    for (int i = 0; i < 72; i++) {
-        temp = rotasi(pivot,temp,degreeToRad(5));
+    for (int i = 0; i < 24; i++) {
+        temp = rotasi(pivot,temp,degreeToRad(15));
         result.push_back(temp);
     }
 }
 
-void draw_multi_dot(int pivX, int pivY, int curX, int curY, viewport v){
-    point cur;
-
-    cur.x = pivX + curX;
-    cur.y = pivY + curY;
-    if(pointPos(v,cur) == 0)
-        draw_dot(cur.x, cur.y,&green);
-
-    cur.x = pivX - curX;
-    cur.y = pivY + curY;
-    if(pointPos(v,cur) == 0)
-        draw_dot(cur.x, cur.y,&green);
-    
-    cur.x = pivX + curX;
-    cur.y = pivY - curY;
-    if(pointPos(v,cur) == 0)
-        draw_dot(cur.x, cur.y,&green);
-
-    cur.x = pivX - curX;
-    cur.y = pivY - curY;
-    if(pointPos(v,cur) == 0)
-        draw_dot(cur.x, cur.y,&green);
-    
-    cur.x = pivX - curY;
-    cur.y = pivY - curX;
-    if(pointPos(v,cur) == 0)
-        draw_dot(cur.x, cur.y,&green);
-    
-    cur.x = pivX + curY;
-    cur.y = pivY - curX;
-    if(pointPos(v,cur) == 0)
-        draw_dot(cur.x, cur.y,&green);
-    
-    cur.x = pivX - curY;
-    cur.y = pivY + curX;
-    if(pointPos(v,cur) == 0)
-        draw_dot(cur.x, cur.y,&green);
-    
-    cur.x = pivX + curY;
-    cur.y = pivY + curX;
-    if(pointPos(v,cur) == 0)
-       draw_dot(cur.x, cur.y,&green);
+void drawPointer(point center) {
+    // garis lurus keatas
+    for (int i = 0; i < 3; i++) {
+        point temp = {center.x+i -1, center.y-10};
+        point dest = {center.x + i - 1, center.y + 10};
+        draw_line(temp,dest,&white);
+    }
+    for (int i = 0; i < 3; i++) {
+        point temp = {center.x - 10, center.y+i-1};
+        point dest = {center.x + 10, center.y+i-1};
+        draw_line(temp,dest,&white);
+    }
 }
 
 int main () {
-    point p1; // p1 adalah pivot
+     
+
     p1.x = 650;
     p1.y = 350;
 
@@ -407,6 +506,9 @@ int main () {
     drawCircle(30,pusatLingkaran,resultCircle);
     listPoint.push_back(resultCircle);
 
+    
+    int terminate = 0;
+    
     // SETUP DRAW CIRCLE
     int pivX = (int)(vinfo.xres)/2;
     int pivY = (int)(vinfo.yres)-400;
@@ -419,14 +521,14 @@ int main () {
     int Fse = (pivX+1)*(pivX+1) + (pivY-1)*(pivY-1) - r*r;
     int d = Fe + Fse;
     // END SETUP DRAW CIRCLE
-    
-    int terminate = 0;
+
     while (!terminate) {
-        clear_screen(view.xmin,view.ymin,view.xmax+1,view.ymax+1,&black);
+        //clear_screen(view.xmin,view.ymin,view.xmax+1,view.ymax+1,&black);
 		draw_line(c[0], c[1],&white);
         draw_line(c[1], c[2],&white);
         draw_line(c[2], c[3],&white);
         draw_line(c[3], c[0],&white);
+        
         
         // --------------------------- Start Clip Plane ---------------------------
         poly_t clipper = {clen, 0, c};
@@ -449,7 +551,35 @@ int main () {
             }
         }
         // Akhir pewarnaan
+        
+        // simpan data yang akan ditimpa oleh pointer
+        if (pointerMemList.size() == 0) {
+            for (int i = 0; i < 3; i ++) {
+                memList temp;
+                temp.size = 22;
+                temp.direction = 's';
+                point startPoint = {p1.x+i-1, p1.y-10};
+                temp.startPoint = startPoint;
+                storeMemory(temp);
+                pointerMemList.push_back(temp);
+            }
 
+            for (int i = 0; i < 3; i ++) {
+                memList temp;
+                temp.size = 21;
+                temp.direction = 'd';
+                point startPoint = {p1.x-10, p1.y+i-1};
+                temp.startPoint = startPoint;
+                storeMemory(temp);
+                pointerMemList.push_back(temp);
+            }
+        }
+
+        
+        //redraw(pointerMemList);
+
+        //moveViewport(terminate,pointerMemList[0]);
+        
         // DRAW CIRCLE
         draw_multi_dot(pivX,pivY,curX,curY,view);
 
@@ -462,16 +592,16 @@ int main () {
             }
             curX++;
             draw_multi_dot(pivX,pivY,curX,curY,view);
-            std::cout << curX << "," << curY << "\n";
+            
         }
 
         int d = Fe + Fse;
         curX = 0;
         curY = r;
         // END DRAW CIRCLE
-
-        moveViewport(terminate);
+            drawPointer(p1);
+            movePointer(terminate);
+        
 	}
     return 0;
 }
-
