@@ -32,7 +32,7 @@
 #include <linux/input.h>
 #include <unistd.h>
 
-#define MOUSEFILE "/dev/input/mouse0\0"
+#define MOUSEFILE "/dev/input/mice\0"
 //
 int main()
 {
