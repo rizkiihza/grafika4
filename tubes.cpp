@@ -40,6 +40,9 @@ color notSoBlack = {50,50,50,0};
 color green = {	0, 255, 0, 0 };
 color blue = { 0, 0, 255, 0 };
 
+
+
+
 void storeMemory(memList &entry) {
     int addx = 0, addy = 0;
     for (int i = 0; i < entry.size; i++) {
@@ -88,6 +91,50 @@ void draw_dot(int x, int y, color* c) {
         unsigned short int t = r<<11 | g << 5 | b;
         *((unsigned short int*)(fbp + position)) = t;
     }
+}
+
+void draw_multi_dot(int pivX, int pivY, int curX, int curY, viewport v){
+    point cur;
+
+    cur.x = pivX + curX;
+    cur.y = pivY + curY;
+    if(pointPos(v,cur) == 0)
+        draw_dot(cur.x, cur.y,&green);
+
+    cur.x = pivX - curX;
+    cur.y = pivY + curY;
+    if(pointPos(v,cur) == 0)
+        draw_dot(cur.x, cur.y,&white);
+    
+    cur.x = pivX + curX;
+    cur.y = pivY - curY;
+    if(pointPos(v,cur) == 0)
+        draw_dot(cur.x, cur.y,&white);
+
+    cur.x = pivX - curX;
+    cur.y = pivY - curY;
+    if(pointPos(v,cur) == 0)
+        draw_dot(cur.x, cur.y,&white);
+    
+    cur.x = pivX - curY;
+    cur.y = pivY - curX;
+    if(pointPos(v,cur) == 0)
+        draw_dot(cur.x, cur.y,&white);
+    
+    cur.x = pivX + curY;
+    cur.y = pivY - curX;
+    if(pointPos(v,cur) == 0)
+        draw_dot(cur.x, cur.y,&white);
+    
+    cur.x = pivX - curY;
+    cur.y = pivY + curX;
+    if(pointPos(v,cur) == 0)
+        draw_dot(cur.x, cur.y,&white);
+    
+    cur.x = pivX + curY;
+    cur.y = pivY + curX;
+    if(pointPos(v,cur) == 0)
+       draw_dot(cur.x, cur.y,&white);
 }
 
 int draw_line(point p1, point p2, color* c) {
@@ -462,9 +509,21 @@ int main () {
     
     int terminate = 0;
     
+    // SETUP DRAW CIRCLE
+    int pivX = (int)(vinfo.xres)/2;
+    int pivY = (int)(vinfo.yres)-400;
+    int r = 50;
+
+    int curX = 0;
+    int curY = r;
+    
+    int Fe = (pivX+1)*(pivX+1) + (pivY)*(pivY) - r*r;
+    int Fse = (pivX+1)*(pivX+1) + (pivY-1)*(pivY-1) - r*r;
+    int d = Fe + Fse;
+    // END SETUP DRAW CIRCLE
 
     while (!terminate) {
-        clear_screen(view.xmin,view.ymin,view.xmax+1,view.ymax+1,&black);
+        //clear_screen(view.xmin,view.ymin,view.xmax+1,view.ymax+1,&black);
 		draw_line(c[0], c[1],&white);
         draw_line(c[1], c[2],&white);
         draw_line(c[2], c[3],&white);
@@ -521,11 +580,28 @@ int main () {
 
         //moveViewport(terminate,pointerMemList[0]);
         
-        
+        // DRAW CIRCLE
+        draw_multi_dot(pivX,pivY,curX,curY,view);
+
+        while(curX <= curY){
+            if(d > 0){
+                curY--;
+                d = d + 4*(curX-curY) + 10;
+            }else{
+                d = d + 4*curX + 6;
+            }
+            curX++;
+            draw_multi_dot(pivX,pivY,curX,curY,view);
+            
+        }
+
+        int d = Fe + Fse;
+        curX = 0;
+        curY = r;
+        // END DRAW CIRCLE
             drawPointer(p1);
             movePointer(terminate);
         
 	}
     return 0;
 }
-
