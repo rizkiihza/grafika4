@@ -308,37 +308,37 @@ void draw_multi_dot(int pivX, int pivY, int curX, int curY, viewport v){
     cur.x = pivX - curX;
     cur.y = pivY + curY;
     if(pointPos(v,cur) == 0)
-        draw_dot(cur.x, cur.y,&green);
+        draw_dot(cur.x, cur.y,&white);
     
     cur.x = pivX + curX;
     cur.y = pivY - curY;
     if(pointPos(v,cur) == 0)
-        draw_dot(cur.x, cur.y,&green);
+        draw_dot(cur.x, cur.y,&white);
 
     cur.x = pivX - curX;
     cur.y = pivY - curY;
     if(pointPos(v,cur) == 0)
-        draw_dot(cur.x, cur.y,&green);
+        draw_dot(cur.x, cur.y,&white);
     
     cur.x = pivX - curY;
     cur.y = pivY - curX;
     if(pointPos(v,cur) == 0)
-        draw_dot(cur.x, cur.y,&green);
+        draw_dot(cur.x, cur.y,&white);
     
     cur.x = pivX + curY;
     cur.y = pivY - curX;
     if(pointPos(v,cur) == 0)
-        draw_dot(cur.x, cur.y,&green);
+        draw_dot(cur.x, cur.y,&white);
     
     cur.x = pivX - curY;
     cur.y = pivY + curX;
     if(pointPos(v,cur) == 0)
-        draw_dot(cur.x, cur.y,&green);
+        draw_dot(cur.x, cur.y,&white);
     
     cur.x = pivX + curY;
     cur.y = pivY + curX;
     if(pointPos(v,cur) == 0)
-       draw_dot(cur.x, cur.y,&green);
+       draw_dot(cur.x, cur.y,&white);
 }
 
 int main () {
