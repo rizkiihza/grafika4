@@ -297,6 +297,50 @@ void drawCircle(int r, point pivot, vector<point> &result) {
     }
 }
 
+void draw_multi_dot(int pivX, int pivY, int curX, int curY, viewport v){
+    point cur;
+
+    cur.x = pivX + curX;
+    cur.y = pivY + curY;
+    if(pointPos(v,cur) == 0)
+        draw_dot(cur.x, cur.y,&green);
+
+    cur.x = pivX - curX;
+    cur.y = pivY + curY;
+    if(pointPos(v,cur) == 0)
+        draw_dot(cur.x, cur.y,&green);
+    
+    cur.x = pivX + curX;
+    cur.y = pivY - curY;
+    if(pointPos(v,cur) == 0)
+        draw_dot(cur.x, cur.y,&green);
+
+    cur.x = pivX - curX;
+    cur.y = pivY - curY;
+    if(pointPos(v,cur) == 0)
+        draw_dot(cur.x, cur.y,&green);
+    
+    cur.x = pivX - curY;
+    cur.y = pivY - curX;
+    if(pointPos(v,cur) == 0)
+        draw_dot(cur.x, cur.y,&green);
+    
+    cur.x = pivX + curY;
+    cur.y = pivY - curX;
+    if(pointPos(v,cur) == 0)
+        draw_dot(cur.x, cur.y,&green);
+    
+    cur.x = pivX - curY;
+    cur.y = pivY + curX;
+    if(pointPos(v,cur) == 0)
+        draw_dot(cur.x, cur.y,&green);
+    
+    cur.x = pivX + curY;
+    cur.y = pivY + curX;
+    if(pointPos(v,cur) == 0)
+       draw_dot(cur.x, cur.y,&green);
+}
+
 int main () {
     point p1; // p1 adalah pivot
     p1.x = 650;
@@ -363,6 +407,18 @@ int main () {
     drawCircle(30,pusatLingkaran,resultCircle);
     listPoint.push_back(resultCircle);
 
+    // SETUP DRAW CIRCLE
+    int pivX = (int)(vinfo.xres)/2;
+    int pivY = (int)(vinfo.yres)-400;
+    int r = 50;
+
+    int curX = 0;
+    int curY = r;
+    
+    int Fe = (pivX+1)*(pivX+1) + (pivY)*(pivY) - r*r;
+    int Fse = (pivX+1)*(pivX+1) + (pivY-1)*(pivY-1) - r*r;
+    int d = Fe + Fse;
+    // END SETUP DRAW CIRCLE
     
     int terminate = 0;
     while (!terminate) {
@@ -393,6 +449,26 @@ int main () {
             }
         }
         // Akhir pewarnaan
+
+        // DRAW CIRCLE
+        draw_multi_dot(pivX,pivY,curX,curY,view);
+
+        while(curX <= curY){
+            if(d > 0){
+                curY--;
+                d = d + 4*(curX-curY) + 10;
+            }else{
+                d = d + 4*curX + 6;
+            }
+            curX++;
+            draw_multi_dot(pivX,pivY,curX,curY,view);
+            std::cout << curX << "," << curY << "\n";
+        }
+
+        int d = Fe + Fse;
+        curX = 0;
+        curY = r;
+        // END DRAW CIRCLE
 
         moveViewport(terminate);
 	}
