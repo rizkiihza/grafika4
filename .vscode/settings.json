@@ -4,6 +4,7 @@
         "initializer_list": "cpp",
         "bitset": "cpp",
         "*.tcc": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "ostream": "cpp"
     }
 }
