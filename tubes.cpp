@@ -519,11 +519,12 @@ int main () {
     
     int Fe = (pivX+1)*(pivX+1) + (pivY)*(pivY) - r*r;
     int Fse = (pivX+1)*(pivX+1) + (pivY-1)*(pivY-1) - r*r;
-    int d = Fe + Fse;
+    int d = 3 - (2 * r);
+    cout << d << " ";
     // END SETUP DRAW CIRCLE
 
     while (!terminate) {
-        //clear_screen(view.xmin,view.ymin,view.xmax+1,view.ymax+1,&black);
+        clear_screen(view.xmin,view.ymin,view.xmax+1,view.ymax+1,&black);
 		draw_line(c[0], c[1],&white);
         draw_line(c[1], c[2],&white);
         draw_line(c[2], c[3],&white);
@@ -595,7 +596,7 @@ int main () {
             
         }
 
-        int d = Fe + Fse;
+        d = 3 - (2 * r);
         curX = 0;
         curY = r;
         // END DRAW CIRCLE
