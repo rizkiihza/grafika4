@@ -744,8 +744,6 @@ int main () {
 	}
 	printf("The framebuffer device was mapped to memory successfully.\n");
 
-<<<<<<< HEAD
-
  // initialize mouse
         if((fd = open(MOUSEFILE, O_RDONLY | O_NONBLOCK )) == -1)
     {
@@ -756,8 +754,7 @@ int main () {
     {
         printf("NonBlocking %s open OK\n",MOUSEFILE);
     }
-=======
->>>>>>> 3be7f743aa2de24c280c5f6d8732a6954cb3dae1
+
 	clear_screen(0,0,800, 600, &notSoBlack);
 	addListPoint("listPolygon.txt",p1);
 
@@ -772,8 +769,19 @@ int main () {
     view.p3 = c[2];
     view.p4 = c[3];
     initialize(&view);
+    viewHid.push_back(view);
   
     int terminate = 0;
+
+    point cx[] = {{100,550}, {200,550}, {200,570}, {100,570}};
+
+    viewport viewx;
+    viewx.p1 = cx[0];
+    viewx.p2 = cx[1];
+    viewx.p3 = cx[2];
+    viewx.p4 = cx[3];
+    initialize(&viewx);
+    viewTembus.push_back(viewx);
     
     // SETUP DRAW CIRCLE
     
@@ -786,77 +794,77 @@ int main () {
     int d = 3 - (2 * r);
     
     // END SETUP DRAW CIRCLE
-
+    bool redrawMap = true;
     while (!terminate) {
-        clear_screen(view.xmin,view.ymin,view.xmax+1,view.ymax+1,&black);
-		draw_line(c[0], c[1],&white);
-        draw_line(c[1], c[2],&white);
-        draw_line(c[2], c[3],&white);
-        draw_line(c[3], c[0],&white);
-        
-        
-        // --------------------------- Start Clip Plane ---------------------------
-        poly_t clipper = {clen, 0, c};
-
-        for (int listPolygonIte = 0; listPolygonIte < listPoint_bangunan.size(); listPolygonIte++) {
-            poly_t subject = {listPoint_bangunan[listPolygonIte].size(), 0, &listPoint_bangunan[listPolygonIte][0]};
-            poly res = poly_clip(&subject, &clipper);
-            if(res->len > 0){
-                for (int i = 0; i < res->len -1; i++) {
-                    draw_line(res->v[i], res->v[i+1], &white);
-                }
-                draw_line(res->v[res->len -1], res->v[0], &white);
-            }
-        }
-
-        for (int listPolygonIte = 0; listPolygonIte < listPoint_jalan.size(); listPolygonIte++) {
-            poly_t subject = {listPoint_jalan[listPolygonIte].size(), 0, &listPoint_jalan[listPolygonIte][0]};
-            poly res = poly_clip(&subject, &clipper);
-            if(res->len > 0){
-                for (int i = 0; i < res->len -1; i++) {
-                    draw_line(res->v[i], res->v[i+1], &white);
-                }
-                draw_line(res->v[res->len -1], res->v[0], &white);
-            }
-        }
-        
-        // Bagian pewarnaan
-        for (int i = 0; i < colorTupleList.size(); i++) {
-            if (pointPos(view,colorTupleList[i].first) == 0) {
-                fillPolygon(colorTupleList[i],black);
-            }
-        }
-        // Akhir pewarnaan
-        
-        // DRAW CIRCLE
-        draw_multi_dot(pivX,pivY,curX,curY,view);
-
-        while(curX <= curY){
-            if(d > 0){
-                curY--;
-                d = d + 4*(curX-curY) + 10;
-            }else{
-                d = d + 4*curX + 6;
-            }
-            curX++;
-            draw_multi_dot(pivX,pivY,curX,curY,view);
+        if (redrawMap) {
+            clear_screen(view.xmin,view.ymin,view.xmax+1,view.ymax+1,&black);
+            draw_line(c[0], c[1],&white);
+            draw_line(c[1], c[2],&white);
+            draw_line(c[2], c[3],&white);
+            draw_line(c[3], c[0],&white);
             
-        }
+            
+            // --------------------------- Start Clip Plane ---------------------------
+            poly_t clipper = {clen, 0, c};
 
-        d = 3 - (2 * r);
-        curX = 0;
-        curY = r;
-        // END DRAW CIRCLE
-        
+            for (int listPolygonIte = 0; listPolygonIte < listPoint_bangunan.size(); listPolygonIte++) {
+                poly_t subject = {listPoint_bangunan[listPolygonIte].size(), 0, &listPoint_bangunan[listPolygonIte][0]};
+                poly res = poly_clip(&subject, &clipper);
+                if(res->len > 0){
+                    for (int i = 0; i < res->len -1; i++) {
+                        draw_line(res->v[i], res->v[i+1], &white);
+                    }
+                    draw_line(res->v[res->len -1], res->v[0], &white);
+                }
+            }
+
+            for (int listPolygonIte = 0; listPolygonIte < listPoint_jalan.size(); listPolygonIte++) {
+                poly_t subject = {listPoint_jalan[listPolygonIte].size(), 0, &listPoint_jalan[listPolygonIte][0]};
+                poly res = poly_clip(&subject, &clipper);
+                if(res->len > 0){
+                    for (int i = 0; i < res->len -1; i++) {
+                        draw_line(res->v[i], res->v[i+1], &white);
+                    }
+                    draw_line(res->v[res->len -1], res->v[0], &white);
+                }
+            }
+            
+            // Bagian pewarnaan
+            for (int i = 0; i < colorTupleList.size(); i++) {
+                if (pointPos(view,colorTupleList[i].first) == 0) {
+                    fillPolygon(colorTupleList[i],black);
+                }
+            }
+            // Akhir pewarnaan
+            
+            // DRAW CIRCLE
+            draw_multi_dot(pivX,pivY,curX,curY,view);
+
+            while(curX <= curY){
+                if(d > 0){
+                    curY--;
+                    d = d + 4*(curX-curY) + 10;
+                }else{
+                    d = d + 4*curX + 6;
+                }
+                curX++;
+                draw_multi_dot(pivX,pivY,curX,curY,view);
+                
+            }
+
+            d = 3 - (2 * r);
+            curX = 0;
+            curY = r;
+            // END DRAW CIRCLE
+        }
         if (mouseOn) {
             mouseMovement(viewHid,viewTembus,p1,terminate);
+            redrawMap = false;
         } else { // keyboard is on
             moveViewport(terminate);
+            redrawMap = true;
         }   
 	}
-<<<<<<< HEAD
-	
-=======
->>>>>>> 3be7f743aa2de24c280c5f6d8732a6954cb3dae1
+
     return 0;
 }
