@@ -20,6 +20,7 @@ struct fb_fix_screeninfo finfo;
 // inisialisasi variabel
 vector<vector<point> > listPoint_bangunan;
 vector<vector<point> > listPoint_jalan;
+vector<vector <point> pusat_cirlce;
 vector<pair<point,char> > colorTupleList;
 
 typedef struct {
@@ -41,6 +42,9 @@ color notSoBlack = {50,50,50,0};
 color green = {	0, 255, 0, 0 };
 color blue = { 0, 0, 255, 0 };
 
+int pivX = 650;
+int pivY = 350;
+int r = 30;
 
 
 
@@ -403,7 +407,7 @@ void addListPoint(string listPointFileName, point shift){
 
 
 
-void moveViewport(int& terminate, memList &entry) {
+void moveViewport(int& terminate) {
     system ("/bin/stty raw -echo");
     char cin = ' ';
     do {
@@ -520,18 +524,16 @@ int main () {
     view.p4 = c[3];
     initialize(&view);
 
-    point pusatLingkaran = {650, 350};
-    vector<point> resultCircle;
-    drawCircle(30,pusatLingkaran,resultCircle);
-    listPoint_bangunan.push_back(resultCircle);
+    // point pusatLingkaran = {650, 350};
+    // vector<point> resultCircle;
+    // drawCircle(30,pusatLingkaran,resultCircle);
+    // listPoint_bangunan.push_back(resultCircle);
 
     
     int terminate = 0;
     
     // SETUP DRAW CIRCLE
-    int pivX = (int)(vinfo.xres)/2;
-    int pivY = (int)(vinfo.yres)-400;
-    int r = 50;
+    
 
     int curX = 0;
     int curY = r;
@@ -630,8 +632,8 @@ int main () {
         curX = 0;
         curY = r;
         // END DRAW CIRCLE
-            drawPointer(p1);
-            movePointer(terminate);
+            // drawPointer(p1);
+            moveViewport(terminate);
         
 	}
     return 0;
