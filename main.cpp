@@ -25,6 +25,7 @@ struct input_event ie;
 // inisialisasi variabel
 vector<vector<point> > listPoint;
 vector<pair<point,char> > colorTupleList;
+vector<viewport> viewTembus;
 
 typedef struct {
     point startPoint;
@@ -451,9 +452,21 @@ void readMouseInput(point &result, int &terminate) {
             bRight = ( button & 0x2 ) > 0;
             x=(char) ptr[1];y=(char) ptr[2];
             if (bLeft ==1) {
-                //  printf("\nright+left ,EXIT\n");
-                //  fflush(stdout);
-                selected1 = !selected1;
+                // check coordinate range
+                int hasil = -1;
+                int traversal = 0;
+                while ((hasil == -1) && (traversal < viewTembus.size())) {
+                    if (pointPos(viewTembus[traversal],result) == 0) {
+                        hasil = traversal;
+                    } else {
+                        traversal++;
+                    }
+                }
+                // warnain viewport ke result;
+                if (hasil > -1) {
+                    selected1 = !selected1;
+                }
+
             }
             // computes absolute x,y coordinates
             result.x +=x;
@@ -629,7 +642,7 @@ clear_screen(0,0,800, 600, &notSoBlack);
     viewx.p3 = cx[2];
     viewx.p4 = cx[3];
     initialize(&viewx);
-    vector<viewport> viewTembus;
+    
     viewTembus.push_back(viewx);
     viewHid.push_back(view);
 
