@@ -463,6 +463,7 @@ void clear_screen(int xx, int yy, int width, int height, color *desired) {
         }
     }
 }
+
 void redraw(vector<memList> &listEntry) {
     for (int j = 0; j < listEntry.size(); j++) {
         memList entry = listEntry[j];

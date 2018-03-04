@@ -435,7 +435,7 @@ void drawPointer(point center) {
 
 int fd;
 int selected1 = 0;
-
+int selected2 = 0;
 
 void readMouseInput(point &result, int &terminate) {
     unsigned char *ptr = (unsigned char*)&ie;
@@ -463,8 +463,10 @@ void readMouseInput(point &result, int &terminate) {
                     }
                 }
                 // warnain viewport ke result;
-                if (hasil > -1) {
+                if (hasil == 0) {
                     selected1 = !selected1;
+                } else if (hasil == 1) {
+                    selected2 = !selected2;
                 }
 
             }
