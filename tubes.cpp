@@ -40,7 +40,9 @@ color black = {	0, 0, 0, 0 };
 color notSoBlack = {50,50,50,0};
 color green = {	0, 255, 0, 0 };
 color blue = { 0, 0, 255, 0 };
+color red = {255, 0, 0, 0};
 
+point piv;
 int pivX = 650;
 int pivY = 350;
 int r = 30;
@@ -462,7 +464,8 @@ void drawPointer(point center) {
 }
 
 int main () {
-     
+     piv.x=650;
+     piv.y=350;
 
     p1.x = 650;
     p1.y = 350;
@@ -533,7 +536,7 @@ int main () {
     
     // SETUP DRAW CIRCLE
     
-
+    pivX=piv.x;
     int curX = 0;
     int curY = r;
     
