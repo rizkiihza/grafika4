@@ -744,6 +744,7 @@ int main () {
 	}
 	printf("The framebuffer device was mapped to memory successfully.\n");
 
+<<<<<<< HEAD
 
  // initialize mouse
         if((fd = open(MOUSEFILE, O_RDONLY | O_NONBLOCK )) == -1)
@@ -755,6 +756,8 @@ int main () {
     {
         printf("NonBlocking %s open OK\n",MOUSEFILE);
     }
+=======
+>>>>>>> 3be7f743aa2de24c280c5f6d8732a6954cb3dae1
 	clear_screen(0,0,800, 600, &notSoBlack);
 	addListPoint("listPolygon.txt",p1);
 
@@ -851,6 +854,9 @@ int main () {
             moveViewport(terminate);
         }   
 	}
+<<<<<<< HEAD
 	
+=======
+>>>>>>> 3be7f743aa2de24c280c5f6d8732a6954cb3dae1
     return 0;
 }
