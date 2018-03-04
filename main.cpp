@@ -433,6 +433,7 @@ void drawPointer(point center) {
 }
 
 int fd;
+int selected1 = 0;
 
 
 void readMouseInput(point &result, int &terminate) {
@@ -449,6 +450,11 @@ void readMouseInput(point &result, int &terminate) {
             bMiddle = ( button & 0x4 ) > 0;
             bRight = ( button & 0x2 ) > 0;
             x=(char) ptr[1];y=(char) ptr[2];
+            if (bLeft ==1) {
+                //  printf("\nright+left ,EXIT\n");
+                //  fflush(stdout);
+                selected1 = !selected1;
+            }
             // computes absolute x,y coordinates
             result.x +=x;
             result.y -=y;
@@ -471,6 +477,51 @@ void readMouseInput(point &result, int &terminate) {
             break;
         }
     }
+}
+
+
+
+void mouseMovement(vector<viewport> viewHid, vector<viewport> viewTembus, point &center, int &terminate) {
+    int result = 1;
+
+    for (int i = 0; i < viewHid.size(); i++) {
+        if (pointerPos(viewHid[i], p1) == 0) {
+            result = 0;
+            break;
+        }
+    }
+    if (result != 0) {
+        drawPointer(p1);
+    }
+    point tempP = {p1.x, p1.y};
+    readMouseInput(p1, terminate);
+    // cout << terminate;
+    result = 1;
+
+    for (int i = 0; i < viewHid.size(); i++) {
+        if (pointerPos(viewHid[i], tempP) == 0) {
+            result = 0;
+            break;
+        }
+    }
+    if (result != 0) {
+        redraw(tempP);
+    }
+    
+    // redraw viewport yang ketimpa padahal hrsnya enggak
+    for (int i = 0; i < viewTembus.size(); i++) {
+        
+        clear_screen(viewTembus[i].xmin, viewTembus[i].ymin, viewTembus[i].xmax+1, viewTembus[i].ymax+1, &black);
+        
+        draw_line(viewTembus[i].p1, viewTembus[i].p2, &white);
+        draw_line(viewTembus[i].p2, viewTembus[i].p3, &white);
+        draw_line(viewTembus[i].p3, viewTembus[i].p4, &white);
+        draw_line(viewTembus[i].p4, viewTembus[i].p1, &white);
+        if (selected1) {
+            fil(111,555,0,green,black);
+        }
+    }
+
 }
 
 int main () {
@@ -568,6 +619,20 @@ clear_screen(0,0,800, 600, &notSoBlack);
     int d = 3 - (2 * r);
     // END SETUP DRAW CIRCLE
 
+    vector<viewport> viewHid;
+
+    point cx[] = {{100,550}, {200,550}, {200,570}, {100,570}};
+
+    viewport viewx;
+    viewx.p1 = cx[0];
+    viewx.p2 = cx[1];
+    viewx.p3 = cx[2];
+    viewx.p4 = cx[3];
+    initialize(&viewx);
+    vector<viewport> viewTembus;
+    viewTembus.push_back(viewx);
+    viewHid.push_back(view);
+
     while (!terminate) {
         clear_screen(view.xmin,view.ymin,view.xmax+1,view.ymax+1,&black);
 		draw_line(c[0], c[1],&white);
@@ -602,15 +667,7 @@ clear_screen(0,0,800, 600, &notSoBlack);
         
         //movePointer(terminate);
         while (!terminate) {
-            if (pointerPos(view, p1) != 0) {
-                drawPointer(p1);
-            }
-            point tempP = {p1.x, p1.y};
-            readMouseInput(p1, terminate);
-            // cout << terminate;
-            if (pointerPos(view, tempP) != 0) {
-                redraw(tempP);
-            }
+            mouseMovement(viewHid,viewTembus,p1,terminate);
 
         }
         
