@@ -1,45 +1,17 @@
-// #include <linux/input.h>
-// #include <fcntl.h>
-// #include <stdio.h>
-// #include <stdlib.h>
-// #include <unistd.h>
-//
-// int main(int argc, char **argv)
-// {
-//   int fd;
-//   if ((fd = open("/dev/input/mice", O_RDONLY)) < 0) {
-//       perror("evdev open");
-//       exit(1);
-//   }
-//
-//   struct input_event ev;
-//
-//   while(1) {
-//       read(fd, &ev, sizeof(struct input_event));
-//       printf("value %d, type %d, code %d\n",ev.value,ev.type,ev.code);
-//   }
-//
-//   return 0;
-// }
-
-
- /////////////////////////////////////////////////////
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
 #include <linux/input.h>
 #include <unistd.h>
 
-#define MOUSEFILE "/dev/input/mouse0\0"
-//
+#define MOUSEFILE "/dev/input/mice\0"
+
 int main()
 {
     int fd;
     struct input_event ie;
     unsigned char *ptr = (unsigned char*)&ie;
-    //
+    
     unsigned char button,bLeft,bMiddle,bRight;
     char x,y;                                                            // the relX , relY datas
     int absolute_x,absolute_y;

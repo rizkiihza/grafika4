@@ -1,40 +1,73 @@
 #include "rotasi.h"
 #include "scaling.h"
 #include "point_warna.h"
-#include <stdio.h>
-#include <math.h>
-#include <stdlib.h>
-#include <stdint.h>
+#include "clip.h"
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
+#include <iostream>
 #include <unistd.h>
 #include <fcntl.h>
 #include <linux/fb.h>
 #include <sys/mman.h>
 #include <sys/ioctl.h>
-#include <string.h>
-#include <algorithm>
-#include "viewport.cpp"
+#include <fstream>
+#include <linux/input.h>
+using namespace std;
 
+#define MOUSEFILE "/dev/input/mice\0"
 
 // inisialisasi struct
-
 struct fb_var_screeninfo vinfo;
 struct fb_fix_screeninfo finfo;
-vector<point> pp;
-point fillPlane, fillPlane2;
-vector<point> fillvector;
-vector<point> trimResultXmax(100);
-vector<point> trimResultXmin(100);
-vector<point> trimResultYmax(100);
-vector<point> trimResultYmin(100);
+struct input_event ie;
+
+// inisialisasi variabel
+vector<vector<point> > listPoint;
 vector<pair<point,char> > colorTupleList;
-int layarx = 1366;
-int layary = 700;
+
+typedef struct {
+    point startPoint;
+    char direction; // wasd
+    int size;
+    vector<color> resColor;
+} memList;
+
+vector<memList> pointerMemList;
+point p1; // p1 adalah pivot
+int layarx = 800;
+int layary = 600;
 char *fbp = 0;
 
+// inisialisasi daftar warna
 color white = { 255, 255, 255, 0 };
 color black = {	0, 0, 0, 0 };
-color green = {	0, 255, 255, 0 };
-color blue = { 0, 255, 0, 0 };
+color notSoBlack = {50,50,50,0};
+color green = {	0, 255, 0, 0 };
+color blue = { 0, 0, 255, 0 };
+
+void storeMemory(memList &entry) {
+    int addx = 0, addy = 0;
+    for (int i = 0; i < entry.size; i++) {
+        long int position = (entry.startPoint.x + addx + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) + (entry.startPoint.y + addy + vinfo.yoffset) * finfo.line_length;
+        color temp;
+        temp.b = *(fbp + position);
+        temp.g = *(fbp + position + 1);
+        temp.r = *(fbp + position + 2);
+        //cout << (int)(*(fbp + position)) << endl;
+        entry.resColor.push_back(temp);
+        if (entry.direction == 'w') {
+            addy--;
+        } else if (entry.direction == 's') {
+            addy++;
+        } else if (entry.direction == 'a') {
+            addx--;
+        } else if (entry.direction == 'd') {
+            addx++;
+        } 
+    }
+}
+
 
 float degreeToRad(float degree) {
     return (degree * M_PI / 180);
@@ -51,6 +84,7 @@ void draw_dot(int x, int y, color* c) {
         *(fbp + position + 1) = c->g;
         *(fbp + position + 2) = c->r;
         *(fbp + position + 3) = c->a;
+        //cout << (int)(*(fbp + position)) << endl;
     }
     else
     { //assume 16 bit color
@@ -60,6 +94,50 @@ void draw_dot(int x, int y, color* c) {
         unsigned short int t = r<<11 | g << 5 | b;
         *((unsigned short int*)(fbp + position)) = t;
     }
+}
+
+void draw_multi_dot(int pivX, int pivY, int curX, int curY, viewport v){
+    point cur;
+
+    cur.x = pivX + curX;
+    cur.y = pivY + curY;
+    if(pointPos(v,cur) == 0)
+        draw_dot(cur.x, cur.y,&green);
+
+    cur.x = pivX - curX;
+    cur.y = pivY + curY;
+    if(pointPos(v,cur) == 0)
+        draw_dot(cur.x, cur.y,&white);
+    
+    cur.x = pivX + curX;
+    cur.y = pivY - curY;
+    if(pointPos(v,cur) == 0)
+        draw_dot(cur.x, cur.y,&white);
+
+    cur.x = pivX - curX;
+    cur.y = pivY - curY;
+    if(pointPos(v,cur) == 0)
+        draw_dot(cur.x, cur.y,&white);
+    
+    cur.x = pivX - curY;
+    cur.y = pivY - curX;
+    if(pointPos(v,cur) == 0)
+        draw_dot(cur.x, cur.y,&white);
+    
+    cur.x = pivX + curY;
+    cur.y = pivY - curX;
+    if(pointPos(v,cur) == 0)
+        draw_dot(cur.x, cur.y,&white);
+    
+    cur.x = pivX - curY;
+    cur.y = pivY + curX;
+    if(pointPos(v,cur) == 0)
+        draw_dot(cur.x, cur.y,&white);
+    
+    cur.x = pivX + curY;
+    cur.y = pivY + curX;
+    if(pointPos(v,cur) == 0)
+       draw_dot(cur.x, cur.y,&white);
 }
 
 int draw_line(point p1, point p2, color* c) {
@@ -175,11 +253,8 @@ int draw_line(point p1, point p2, color* c) {
 }
 
 void clear_screen(int xx, int yy, int width, int height, color *desired) {
-    
-    for(int x=xx; x<width; x++)
-    {
-        for(int y=0; y<height; y++)
-        {
+    for(int x=xx; x<width; x++) {
+        for(int y=yy; y<height; y++) {
             long int position = (x + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) +
                (y + vinfo.yoffset) * finfo.line_length;
             *(fbp + position) = desired->b;
@@ -187,6 +262,37 @@ void clear_screen(int xx, int yy, int width, int height, color *desired) {
             *(fbp + position + 2) = desired->r;
             *(fbp + position + 3) = desired->a;
         }
+    }
+}
+void redraw(point center) {
+    // garis lurus keatas
+    for (int i = 0; i < 3; i++) {
+        point temp = {center.x+i -1, center.y-10};
+        point dest = {center.x + i - 1, center.y + 10};
+        draw_line(temp,dest,&notSoBlack);
+    }
+    for (int i = 0; i < 3; i++) {
+        point temp = {center.x - 10, center.y+i-1};
+        point dest = {center.x + 10, center.y+i-1};
+        draw_line(temp,dest,&notSoBlack);
+    }
+}
+
+
+void movePointer(int& terminate) {
+    system ("/bin/stty raw -echo");
+    char cin = ' ';
+    do {
+        cin = getchar();
+        
+    } while ((cin != 'w') && (cin != 'q') && (cin != 'a') && (cin != 's') && (cin != 'd'));
+    system ("/bin/stty cooked echo");
+    
+    if (cin == 'q') {
+        terminate = 1;
+    } else {
+        // remove pointer yang ada
+            translasi(p1,cin,1);
     }
 }
 
@@ -220,21 +326,17 @@ void insertToVector(vector<point> &insertedVector, string nama_file, point shift
 	charmap = fopen(nama_file.c_str(), "r");
 
 	int jumlah_loop;
-	//printf("Jumlah loop = %d\n", jumlah_loop);
 	point tempCharPoint;
 		
 	int i = 0;
 	int jumlah_titik;
 	fscanf(charmap, "%d", &jumlah_titik);
-	//printf("Jumlah titik pada loop %d = %d\n", current_loop, jumlah_titik);
 	for (int k = 0; k < jumlah_titik; k++) {
 		int x,y;
 		fscanf(charmap, "%d  %d", &x, &y);
-		//printf("%d %d ", x, y);
 		tempCharPoint.x = x+shift.x;
 		tempCharPoint.y = y+shift.y;
 		insertedVector.push_back(tempCharPoint);
-		//printf("%d %d\n", charpoints[k].absis, charpoints[k].ordinat);
 	}
     insertedVector.push_back(insertedVector[0]);
 	int jumlah_loop_warna;
@@ -255,38 +357,133 @@ void insertToVector(vector<point> &insertedVector, string nama_file, point shift
 void fillPolygon(pair<point,char> p, color &replaced) {
     if (p.second == 'g') {
         fil(p.first.x,p.first.y,0,green,replaced);
-        printf("color %f %f\n",p.first.x,p.first.y);
+    } else if (p.second == 'w') {
+        fil(p.first.x,p.first.y,0,white,replaced);
+    } else if (p.second == 'b') {
+        fil(p.first.x,p.first.y,0,blue,replaced);
+    }
+}
+
+void addListPoint(string listPointFileName, point shift){
+	int jumlah_bidang;
+    ifstream charmap;
+    charmap.open("listPolygon.txt");
+	charmap >> jumlah_bidang;
+	for (int k = 0; k < jumlah_bidang; k++) {
+		int x,y;
+        string namaFile;
+		charmap >> namaFile;
+		vector<point> temp;
+        insertToVector(temp,namaFile,shift);
+        listPoint.push_back(temp);
+	}
+}
+
+
+
+
+void moveViewport(int& terminate, memList &entry) {
+    system ("/bin/stty raw -echo");
+    char cin = ' ';
+    do {
+        cin = getchar();
+        
+    } while ((cin != 'w') && (cin != 'q') && (cin != 'a') && (cin != 's') && (cin != 'd'));
+    system ("/bin/stty cooked echo");
+    
+    if (cin == 'q') {
+        terminate = 1;
+    } else {
+        for (int ite = 0; ite < listPoint.size(); ite++) {
+            translasiBanyak(listPoint[ite],cin,10);
+        }
+        for (int ite = 0; ite < colorTupleList.size(); ite++) {
+            translasi((colorTupleList[ite].first),cin,10);
+        }
+        // redraw yg tadinya ditimpa
+        
+        translasi(p1,cin,10);
+        
     }
 }
 
 
+void drawCircle(int r, point pivot, vector<point> &result) {
+    // ambil titik atas
+    point temp = {pivot.x, pivot.y - r};
+    result.push_back(temp);
+    for (int i = 0; i < 24; i++) {
+        temp = rotasi(pivot,temp,degreeToRad(15));
+        result.push_back(temp);
+    }
+}
+
+void drawPointer(point center) {
+    // garis lurus keatas
+    for (int i = 0; i < 3; i++) {
+        point temp = {center.x+i -1, center.y-10};
+        point dest = {center.x + i - 1, center.y + 10};
+        draw_line(temp,dest,&white);
+    }
+    for (int i = 0; i < 3; i++) {
+        point temp = {center.x - 10, center.y+i-1};
+        point dest = {center.x + 10, center.y+i-1};
+        draw_line(temp,dest,&white);
+    }
+}
+
+int fd;
+
+
+void readMouseInput(point &result, int &terminate) {
+    unsigned char *ptr = (unsigned char*)&ie;
+    
+    unsigned char button,bLeft,bMiddle,bRight;
+    char x,y;                                                            // the relX , relY datas
+    int absolute_x,absolute_y;
+    while (1) {
+        if(read(fd, &ie, sizeof(struct input_event))!=-1) {
+            //redraw(result);
+            button=ptr[0];
+            bLeft = button & 0x1;
+            bMiddle = ( button & 0x4 ) > 0;
+            bRight = ( button & 0x2 ) > 0;
+            x=(char) ptr[1];y=(char) ptr[2];
+            // computes absolute x,y coordinates
+            result.x +=x;
+            result.y -=y;
+            // set absolute reference ?
+            // pengaman
+            if (result.x < 15) {
+                result.x = 15;
+            }
+            if (result.x > 785) {
+                result.x = 785;
+            }
+            if (result.y < 15) {
+                result.y = 15;
+            }
+            if (result.y > 585) {
+                result.y = 585;
+            }
+            // drawPointer(result);
+            //cout << result.x << " " << result.y << endl;
+            break;
+        }
+    }
+}
+
 int main () {
-    point p1, p2;
+     
+
     p1.x = 650;
     p1.y = 350;
-    p2.x = 0;
-    p2.y = 200;
-    point res;
-    res = rotasi(p1,p2,(degreeToRad(45)));
-    //printf("%f", sin());
-    printf("%f %f\n", res.x, res.y);
-
-    // test rotasi banyak
-    point p[2];
-    p[0].x = 10;
-    p[0].y = 0;
-    p[1].x = 0;
-    p[1].y = 10;
-    //rotasiBanyak(p1, p, degreeToRad(45), 2);
-    printf("%f %f\n", p[0].x, p[0].y);
-    printf("%f %f\n", p[1].x, p[1].y);
 
     int fbfd = 0;
 
 	long int screensize = 0;
 
   	int x = 0, y = 0;
-  	long int location = 0;
 
   	// Open the file for reading and writing
   	fbfd = open("/dev/fb0", O_RDWR);
@@ -317,178 +514,108 @@ int main () {
 	// Map the device to memory
 	fbp = (char *)mmap(0, screensize, PROT_READ | PROT_WRITE, MAP_SHARED,
 			fbfd, 0);
-	if ((int)fbp == -1) {
+	if (atoi(fbp) == -1) {
 		perror("Error: failed to map framebuffer device to memory");
 		exit(4);
 	}
 	printf("The framebuffer device was mapped to memory successfully.\n");
-	//clear_screen(0,0,1366, 700, &black);
+
 	
 
-	//pivot 650,350
-	p2.x = 650;
-	p2.y = 300;
-	
-	point ptemp;
-	insertToVector(pp,"pesawat_tampak_depan.txt",p1);
-	int loop = 0;
-    int increment = 0;
+    // initialize mouse
+        if((fd = open(MOUSEFILE, O_RDONLY | O_NONBLOCK )) == -1)
+    {
+        printf("NonBlocking %s open ERROR\n",MOUSEFILE);
+        exit(EXIT_FAILURE);
+    }
+    else
+    {
+        printf("NonBlocking %s open OK\n",MOUSEFILE);
+    }
+clear_screen(0,0,800, 600, &notSoBlack);
+	addListPoint("listPolygon.txt",p1);
+
     // initialize viewport
-    point pv1 = {x = 300, y = 200};
-    point pv2 = {x = 600, y = 200};
-    point pv3 = {x = 600, y = 500};
-    point pv4 = {x = 300, y = 500};
+    // urutan c[] tidak boleh diubah -> urutan algo sutherland
+    point c[] = {{100,100}, {700,100}, {700,500}, {100,500}};
+    char clen = 4;
+
     viewport view;
-    view.p1 = pv1;
-    view.p2 = pv2;
-    view.p3 = pv3;
-    view.p4 = pv4;
+    view.p1 = c[0];
+    view.p2 = c[1];
+    view.p3 = c[2];
+    view.p4 = c[3];
     initialize(&view);
-	// draw_line(pv1.x,pv1.y,pv2.x,pv2.y,&white);
-    //     draw_line(pv2.x,pv2.y,pv3.x,pv3.y,&white);
-    //     draw_line(pv3.x,pv3.y,pv4.x,pv4.y,&white);
-    //     draw_line(pv4.x,pv4.y,pv1.x,pv1.y,&white);
+
+    point pusatLingkaran = {650, 350};
+    vector<point> resultCircle;
+    drawCircle(30,pusatLingkaran,resultCircle);
+    listPoint.push_back(resultCircle);
 
     
-    // point ptest1 = {x = 200, y = 300};
-    // point ptest2 = {x = 500, y = 400};
-    // point ptest3 = {x = 250, y = 400};
-    // point res1, res2, res3;
-
-    // vector<point> input;
-    // input.push_back(ptest1);
-    // input.push_back(ptest2);
-    // input.push_back(ptest3);
-    // input.push_back(ptest1);
-
-    // trimPolygon(view,input,trimResult,input.size()-1);
-    
-    for (int i = 0; i < trimResultXmin.size(); i++) {
-        //printf("%f %f\n",result[i].x, result[i].y);
-        draw_line(trimResultXmin[i], trimResultXmin[i+1], &green);
-    }
     int terminate = 0;
-    while (increment < 2){
+    
+    // SETUP DRAW CIRCLE
+    int pivX = (int)(vinfo.xres)/2;
+    int pivY = (int)(vinfo.yres)-400;
+    int r = 50;
+
+    int curX = 0;
+    int curY = r;
+    
+    int Fe = (pivX+1)*(pivX+1) + (pivY)*(pivY) - r*r;
+    int Fse = (pivX+1)*(pivX+1) + (pivY-1)*(pivY-1) - r*r;
+    int d = 3 - (2 * r);
+    // END SETUP DRAW CIRCLE
+
     while (!terminate) {
-        for (int i = 0;i < pp.size();i++){
-            printf("%f %f\n",pp[i].x,pp[i].y);
-        }
-        printf("Number of Point Before :%d\n",pp.size());
-        printf("+++++++++++++++++++++++\n");
-        trimPolygonXMin(view,pp,trimResultXmin,pp.size());
-        trimPolygonXMax(view,trimResultXmin,trimResultXmax,trimResultXmin.size());
-        trimPolygonYMin(view,trimResultXmax,trimResultYmin,trimResultXmax.size());
-        int test = trimResultXmin.size();
-		for (int i = 0; i < trimResultYmin.size()-1; i++) {
-			draw_line(trimResultYmin[i], trimResultYmin[i+1], &white);
-            printf("%f %f\n",trimResultXmax[i].x,trimResultXmax[i].y);
-        }
-        printf("%f %f\n",trimResultXmin[test-1].x,trimResultXmax[test-1].y);
-        printf("Number of Point After :%d\n",trimResultXmax.size());
-        printf("====================================\n");
-        usleep(5000);
-		draw_line(pv1, pv2,&white);
-        draw_line(pv2, pv3, &white);
-        draw_line(pv3, pv4, &white);
-        draw_line(pv4, pv1, &white);
-        draw_dot(p1.x,p1.y,&black);
+        clear_screen(view.xmin,view.ymin,view.xmax+1,view.ymax+1,&black);
+		draw_line(c[0], c[1],&white);
+        draw_line(c[1], c[2],&white);
+        draw_line(c[2], c[3],&white);
+        draw_line(c[3], c[0],&white);
         
-        for (int i = 0; i < colorTupleList.size(); i++) {
-            if (pointPos(view,colorTupleList[i].first) == 0) {
-                fillPolygon(colorTupleList[i],black);
+        
+        // --------------------------- Start Clip Plane ---------------------------
+        poly_t clipper = {clen, 0, c};
+
+        // for (int listPolygonIte = 0; listPolygonIte < listPoint.size(); listPolygonIte++) {
+        //     poly_t subject = {listPoint[listPolygonIte].size(), 0, &listPoint[listPolygonIte][0]};
+        //     poly res = poly_clip(&subject, &clipper);
+        //     if(res->len > 0){
+        //         for (int i = 0; i < res->len -1; i++) {
+        //             draw_line(res->v[i], res->v[i+1], &white);
+        //         }
+        //         draw_line(res->v[res->len -1], res->v[0], &white);
+        //     }
+        // }
+        
+        // // Bagian pewarnaan
+        // for (int i = 0; i < colorTupleList.size(); i++) {
+        //     if (pointPos(view,colorTupleList[i].first) == 0) {
+        //         fillPolygon(colorTupleList[i],black);
+        //     }
+        // }
+        // Akhir pewarnaan
+        
+        //moveViewport(terminate,pointerMemList[0]);
+        
+        //movePointer(terminate);
+        while (!terminate) {
+            if (pointerPos(view, p1) != 0) {
+                drawPointer(p1);
             }
+            point tempP = {p1.x, p1.y};
+            readMouseInput(p1, terminate);
+            // cout << terminate;
+            if (pointerPos(view, tempP) != 0) {
+                redraw(tempP);
+            }
+
         }
-       
-        // fil(p1.x,p1.y,0,green, black);
-        // fil(fillPlane.x,fillPlane.y,0,green,black);
-        // fil(fillPlane2.x,fillPlane2.y,0,green,black);
-        
-		
-		// for (int i = 0; i < 30; i++){  
-        //   draw_line(p1.x,p1.y,p2.x+i,p2.y+i,&white);    // Baling2
-        // }
-        
-        // if (loop == 20) break;
-		// // clear screen mini
-        // usleep(500000);
-        // for (int i = 0; i < 30; i++){  
-        //   draw_line(p1.x,p1.y,p2.x+i,p2.y+i,&green);    // Baling2
-        // }
-        clear_screen(view.xmin,view.ymin,view.xmax,view.ymax,&black);
-        // if (p2.y > p1.y){
-            
-        // } else {
-        //     clear_screen(0,p2.y+100,1366,p1.y+30,&black);
-        // } 
         
         
-		// for (int i = 0; i < pp.size()-1; i++) {
-		// 	draw_line(trimResult[i].x, trimResult[i].y, trimResult[i+1].x, trimResult[i+1].y, &black);
-		// }
-        // //usleep(50000);
-		// draw_line(trimResult[pp.size()-1].x,trimResult[pp.size()-1].y,trimResult[0].x,trimResult[0].y,&black);
-		// // p2 = scalePoint(p1,p2,1.1);
-        // // fillPlane = scalePoint(p1,fillPlane,1.1);
-        // // fillPlane2 = scalePoint(p1,fillPlane2,1.1);
-		// p2 = rotasi(p1,p2,degreeToRad(20));
-		//scaleBanyak(p1, trimResult, 1.1, pp.size());
-        for (int i = 0; i < pp.size(); i++) {
-            pp[i].x -= 5;
-            pp[i].y -= 5;
-        }
-        for (int i = 0; i < colorTupleList.size(); i++) {
-            colorTupleList[i].first.x -= 5;
-            colorTupleList[i].first.y -= 5;
-        }
-        p1.x -= 5;
-        p1.y -= 5;
-        p2.x -= 5;
-        fillPlane.x -= 5;
-        fillPlane2.x -= 5;
-		loop++;
 	}
-
-    // while (1) {
-	// 	for (int i = 0; i < pp.size()-1; i++) {
-	// 		draw_line(pp[i].x, pp[i].y, pp[i+1].x, pp[i+1].y, &white);
-	// 	}
-	// 	draw_line(pp[pp.size()-1].x,pp[pp.size()-1].y,pp[0].x,pp[0].y,&white);
-	// 	draw_dot(p1.x,p1.y,&black);
-    //     fil(p1.x,p1.y,0,&green);
-	// 	fil(fillPlane.x,fillPlane.y,0,&green);
-    //     fil(fillPlane2.x,fillPlane2.y,0,&green);
-	// 	for (int i = 0; i < 30; i++){  
-    //       draw_line(p1.x,p1.y,p2.x+i,p2.y+i,&white);    // Baling2
-    //     }
-        
-    //     if (loop == 10) break;
-	// 	// clear screen mini
-    //     usleep(50000);
-    //     for (int i = 0; i < 30; i++){  
-    //       draw_line(p1.x,p1.y,p2.x+i,p2.y+i,&green);    // Baling2
-    //     }
-    //     if (p2.y > p1.y){
-    //         clear_screen(0,pp[3].y,1366,p2.y+100,&black);
-    //     } else {
-    //         clear_screen(0,p2.y+100,1366,pp[8].y,&black);
-    //     } 
-        
-        
-	// 	for (int i = 0; i < pp.size()-1; i++) {
-	// 		draw_line(pp[i].x, pp[i].y, pp[i+1].x, pp[i+1].y, &black);
-	// 	}
-    //     //usleep(50000);
-	// 	draw_line(pp[pp.size()-1].x,pp[pp.size()-1].y,pp[0].x,pp[0].y,&black);
-	// 	p2 = scalePoint(p1,p2,0.9);
-    //     fillPlane = scalePoint(p1,fillPlane,0.9);
-    //     fillPlane2 = scalePoint(p1,fillPlane2,0.9);
-	// 	p2 = rotasi(p1,p2,degreeToRad(20));
-	// 	scaleBanyak(p1, pp, 0.9, pp.size());
-	// 	loop--;
-	// }
-    increment++;
-    }
-
+    close(fd);
     return 0;
 }
-
