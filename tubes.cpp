@@ -18,7 +18,8 @@ struct fb_var_screeninfo vinfo;
 struct fb_fix_screeninfo finfo;
 
 // inisialisasi variabel
-vector<vector<point> > listPoint;
+vector<vector<point> > listPoint_bangunan;
+vectir<vector<point> > listPoint_jalan;
 vector<pair<point,char> > colorTupleList;
 
 typedef struct {
@@ -371,7 +372,7 @@ void fillPolygon(pair<point,char> p, color &replaced) {
     }
 }
 
-void addListPoint(string listPointFileName, point shift){
+void addListPoint(point shift){
 	int jumlah_bidang;
     ifstream charmap;
     charmap.open("listPolygon.txt");
@@ -382,7 +383,7 @@ void addListPoint(string listPointFileName, point shift){
 		charmap >> namaFile;
 		vector<point> temp;
         insertToVector(temp,namaFile,shift);
-        listPoint.push_back(temp);
+        listPoint_bangunan.push_back(temp);
 	}
 
     charmap.open("listPolygon2.txt");
@@ -393,7 +394,7 @@ void addListPoint(string listPointFileName, point shift){
 		charmap >> namaFile;
 		vector<point> temp;
         insertToVector(temp,namaFile,shift);
-        listPoint.push_back(temp);
+        listPoint_jalan.push_back(temp);
 	}    
 }
 
@@ -412,8 +413,11 @@ void moveViewport(int& terminate, memList &entry) {
     if (cin == 'q') {
         terminate = 1;
     } else {
-        for (int ite = 0; ite < listPoint.size(); ite++) {
-            translasiBanyak(listPoint[ite],cin,10);
+        for (int ite = 0; ite < listPoint_bangunan.size(); ite++) {
+            translasiBanyak(listPoint_bangunan[ite],cin,10);
+        }
+        for (int ite = 0; ite < listPoint_jalan.size(); ite++) {
+            translasiBanyak(listPoint_jalan[ite],cin,10);
         }
         for (int ite = 0; ite < colorTupleList.size(); ite++) {
             translasi((colorTupleList[ite].first),cin,10);
@@ -498,7 +502,8 @@ int main () {
 	printf("The framebuffer device was mapped to memory successfully.\n");
 
 	clear_screen(0,0,800, 600, &notSoBlack);
-	addListPoint("listPolygon.txt",p1);
+	addListPoint(p1);
+
 
     // initialize viewport
     // urutan c[] tidak boleh diubah -> urutan algo sutherland
@@ -515,7 +520,7 @@ int main () {
     point pusatLingkaran = {650, 350};
     vector<point> resultCircle;
     drawCircle(30,pusatLingkaran,resultCircle);
-    listPoint.push_back(resultCircle);
+    listPoint_bangunan.push_back(resultCircle);
 
     
     int terminate = 0;
@@ -545,8 +550,19 @@ int main () {
         // --------------------------- Start Clip Plane ---------------------------
         poly_t clipper = {clen, 0, c};
 
-        for (int listPolygonIte = 0; listPolygonIte < listPoint.size(); listPolygonIte++) {
-            poly_t subject = {listPoint[listPolygonIte].size(), 0, &listPoint[listPolygonIte][0]};
+        for (int listPolygonIte = 0; listPolygonIte < listPoint_bangunan.size(); listPolygonIte++) {
+            poly_t subject = {listPoint_bangunan[listPolygonIte].size(), 0, &listPoint_bangunan[listPolygonIte][0]};
+            poly res = poly_clip(&subject, &clipper);
+            if(res->len > 0){
+                for (int i = 0; i < res->len -1; i++) {
+                    draw_line(res->v[i], res->v[i+1], &white);
+                }
+                draw_line(res->v[res->len -1], res->v[0], &white);
+            }
+        }
+
+        for (int listPolygonIte = 0; listPolygonIte < listPoint_jalan.size(); listPolygonIte++) {
+            poly_t subject = {listPoint_jalan[listPolygonIte].size(), 0, &listPoint_jalan[listPolygonIte][0]};
             poly res = poly_clip(&subject, &clipper);
             if(res->len > 0){
                 for (int i = 0; i < res->len -1; i++) {
