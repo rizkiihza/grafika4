@@ -188,10 +188,12 @@ void readFont(string pStr, int length, int first_y, int first_x) {
 		} else  if (pStr[i] == '0') {
 			charmap = fopen("font/0.txt", "r");
 		}else  if (pStr[i] == ' ') {
-			current_x += 20;
+			charmap = fopen("font/spasi.txt", "r");
 		} else if (pStr[i] == '\n') {
 			current_y += 20;
 			current_x = 100;
+		} else {
+			charmap = fopen("font/kotak.txt", "r");
 		}
 		
 		for (int i = 0; i < charheight; i++) {
@@ -233,7 +235,7 @@ void readFont(string pStr, int length, int first_y, int first_x) {
 
 void showMenu() {
 
-	string menus[6] = {"MENU", "Tugas1", "Tugas2", "Tugas3", "Tugas4", "Tugas5"};
+	string menus[6] = {"* MENU", "* Tugas1", "* Tugas2", "* Tugas3", "* Tugas4", "* Tugas5"};
 
 	int first_x = 100;
 	int first_y = 100;
