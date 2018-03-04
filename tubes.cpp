@@ -707,9 +707,6 @@ int main () {
 	}
 	printf("The framebuffer device was mapped to memory successfully.\n");
 
-	showMenu();
-
-/*
 	clear_screen(0,0,800, 600, &notSoBlack);
 	addListPoint("listPolygon.txt",p1);
 
@@ -837,6 +834,5 @@ int main () {
             moveViewport(terminate);
         
 	}
-	*/
     return 0;
 }
