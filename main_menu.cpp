@@ -19,9 +19,147 @@ char *fbp = 0;
 point piv;
 int pivX = 650;
 int pivY = 350;
+int layarx = 800;
+int layary = 1200;
 
 // inisialisasi daftar warna
 color notSoBlack = {50,50,50,0};
+color white = {255,255,255,0};
+
+void draw_dot(int x, int y, color* c) {
+	if((x<1) || (x>layarx) || (y<1) || (y>layary)){
+		return ;
+	}
+    long int position = (x + vinfo.xoffset) * (vinfo.bits_per_pixel / 8) +
+       (y + vinfo.yoffset) * finfo.line_length;
+    if(vinfo.bits_per_pixel == 32){
+        *(fbp + position) = c->b;
+        *(fbp + position + 1) = c->g;
+        *(fbp + position + 2) = c->r;
+        *(fbp + position + 3) = c->a;
+        //cout << (int)(*(fbp + position)) << endl;
+    }
+    else
+    { //assume 16 bit color
+        int b = c->b;
+        int g = c->g;
+        int r = c->r;
+        unsigned short int t = r<<11 | g << 5 | b;
+        *((unsigned short int*)(fbp + position)) = t;
+    }
+}
+
+int draw_line(point p1, point p2, color* c) {
+	if (p2.x < p1.x) {
+		int temp = p1.x;
+		p1.x = p2.x;
+		p2.x = temp;
+		temp = p1.y;
+		p1.y = p2.y;
+		p2.y = temp;
+	}
+
+   int y = p1.y;
+   int x = p1.x;
+   int dy = p2.y - p1.y;
+   int dx = p2.x - p1.x;
+
+
+    //kasus vertikal
+    if (p1.x == p2.x) {
+        for (int y = min(p1.y, p2.y); y <= max(p1.y, p2.y); y++) {
+            draw_dot(x,y,c);
+        }
+    }
+
+    //kasus_horizontal
+    else if (p1.y == p2.y) {
+        for(int x = p1.x; x <= p2.x; x++) {
+            draw_dot(x,y,c);
+        }
+    }
+
+	//kasus miring
+    else {
+        float grad = (float)(p2.y - p1.y)/(float)(p2.x - p1.x);
+
+        //gradien > 0
+        if (grad > 0) {
+                //gradien <= 1
+                if (grad <= 1) {
+                    int dxdy = p2.y - p1.y + p1.x - p2.x;
+                    int F = p2.y - p1.y + p1.x - p2.x;
+                    for (int x = p1.x; x <= p2.x; x++) {
+                        draw_dot(x,y,c);
+                        if (F < 0) {
+                            F += dy;
+                        } else {
+                            y++;
+                            F += dxdy;
+                        }
+                    }
+                }
+
+                //gradien > 1
+                else {
+                    int x = p1.x;
+                    int dx = p2.x - p1.x;
+                    int dxdy = p2.x - p1.x + p1.y - p2.y;
+                    int F = p2.x - p1.x + p1.y - p2.y;
+                    for (int y = p1.y; y <= p2.y; y++) {
+
+                        draw_dot(x,y,c);
+                        if (F < 0) {
+                            F += dx;
+                        } else {
+                            x++;
+                            F += dxdy;
+                        }
+                    }
+                }
+		//gradien < 0
+        } else {
+                //gradien >= -1
+                if (grad >= -1) {
+                    int dy = p2.y - p1.y;
+                    if (dy < 0) {
+                        dy *= -1;
+                    }
+                    int dx = p2.x - p1.x;
+                    int F = 2*dy - dx;
+                    int y = p1.y;
+
+			        for (x = p1.x; x <= p2.x; x++) {
+                        draw_dot(x,y,c);
+                        if (F > 0) {
+                            y--;
+                            F = F - 2*dx;
+                        }
+                        F = F + 2*dy;
+			        }
+                }
+                //gradien < -1
+                else {
+                    int dx = p1.x - p2.x;
+                    if (dx < 0) {
+                        dx *= -1;
+                    }
+                    int dy = p1.y - p2.y;
+                    int F = 2*dx - dy;
+                    int x = p2.x;
+
+			        for (y = p2.y; y <= p1.y; y++) {
+                        draw_dot(x,y,c);
+                        if (F > 0) {
+                            x--;
+                            F = F - 2*dy;
+                        }
+                        F = F + 2*dx;
+			        }
+                }
+        }
+   }
+}
 
 void readFont(string pStr, int length, int first_y, int first_x) {
 	//read char
@@ -213,13 +351,25 @@ void readFont(string pStr, int length, int first_y, int first_x) {
 
 void showMenu() {
 
-	string menus[6] = {"[ ]  MENU", "[ ]  Tugas1", "[ ]  Tugas2", "[ ]  Tugas3", "[ ]  Tugas4", "[ ]  Tugas5"};
+	string menus[6] = {"MENU", "Tugas1", "Tugas2", "Tugas3", "Tugas4", "Tugas5"};
 
 	int first_x = 100;
 	int first_y = 100;
-	for (int i = 0; i < 6; i++) {
-		readFont(menus[i], menus[i].length(), first_y, first_x);
-		first_y += 20;
+	readFont(menus[0], menus[0].length(), first_y + 20, first_x + 20);
+	
+	point p1, p2;
+	for (int i = 1; i < 6; i++) {
+		p1.x = first_x; p1.y = first_y;
+		p2.x = first_x + 160; p2.y = p1.y;
+		draw_line(p1, p2, &white);
+		p1.x = p2.x; p1.y = p2.y + 60;
+		draw_line(p2, p1, &white);
+		p2.x = p1.x - 160; p2.y = p1.y;
+		draw_line(p2, p1, &white);
+		p1.x = p2.x; p1.y = p2.y - 60;
+		draw_line(p2, p1, &white);
+		readFont(menus[i], menus[i].length(), first_y + 20, first_x + 20);
+		first_y += 100;
 	}
 }
 
