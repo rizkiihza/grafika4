@@ -20,7 +20,6 @@ struct fb_fix_screeninfo finfo;
 // inisialisasi variabel
 vector<vector<point> > listPoint_bangunan;
 vector<vector<point> > listPoint_jalan;
-vector<vector <point> pusat_cirlce;
 vector<pair<point,char> > colorTupleList;
 
 typedef struct {
