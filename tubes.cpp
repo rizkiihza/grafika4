@@ -384,6 +384,17 @@ void addListPoint(string listPointFileName, point shift){
         insertToVector(temp,namaFile,shift);
         listPoint.push_back(temp);
 	}
+
+    charmap.open("listPolygon2.txt");
+	charmap >> jumlah_bidang;
+	for (int k = 0; k < jumlah_bidang; k++) {
+		int x,y;
+        string namaFile;
+		charmap >> namaFile;
+		vector<point> temp;
+        insertToVector(temp,namaFile,shift);
+        listPoint.push_back(temp);
+	}    
 }
 
 
