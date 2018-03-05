@@ -56,8 +56,8 @@ color blue = { 0, 0, 255, 0 };
 color red = {255, 0, 0, 0};
 
 point piv;
-int pivX = 650;
-int pivY = 350;
+int pivX;
+int pivY;
 
 void readFont(string pStr, int length, int first_y, int first_x) {
 	//read char
@@ -454,16 +454,12 @@ void redraw(vector<memList> &listEntry) {
             
             if (entry.direction == 'w') {
                 addy--;
-                pivY--;
             } else if (entry.direction == 's') {
                 addy++;
-                pivY++;
             } else if (entry.direction == 'a') {
                 addx--;
-                pivX--;
             } else if (entry.direction == 'd') {
                 addx++;
-                pivX++;
             } 
         }
     }
@@ -766,6 +762,16 @@ void moveViewport(int& terminate) {
             translasi((colorTupleListJalanan[ite].first),cin,10);
         }
 
+        if (cin == 'w') {
+        	pivY = pivY - 10;
+	    } else if (cin == 'a') {
+	        pivX = pivX - 10;      
+	    } else if (cin == 's') {
+	        pivY = pivY + 10;
+	    } else if (cin == 'd') {
+	        pivX = pivX + 10;
+	    }
+
         translasi(p1,cin,10);
         
     }
@@ -870,6 +876,8 @@ int main () {
     viewTembus.push_back(viewp);
     
     // SETUP DRAW CIRCLE
+    pivX = 650;
+    pivY = 350;
     int r = 30;
     int curX = 0;
     int curY = r;
