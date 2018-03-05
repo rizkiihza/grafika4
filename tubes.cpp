@@ -58,7 +58,6 @@ color red = {255, 0, 0, 0};
 point piv;
 int pivX = 650;
 int pivY = 350;
-int r = 30;
 
 void readFont(string pStr, int length, int first_y, int first_x) {
 	//read char
@@ -455,12 +454,16 @@ void redraw(vector<memList> &listEntry) {
             
             if (entry.direction == 'w') {
                 addy--;
+                pivY--;
             } else if (entry.direction == 's') {
                 addy++;
+                pivY++;
             } else if (entry.direction == 'a') {
                 addx--;
+                pivX--;
             } else if (entry.direction == 'd') {
                 addx++;
+                pivX++;
             } 
         }
     }
@@ -865,16 +868,12 @@ int main () {
     viewp.p4 = cp[3];
     initialize(&viewp);
     viewTembus.push_back(viewp);
-    // SETUP DRAW CIRCLE
     
-    pivX=piv.x;
+    // SETUP DRAW CIRCLE
+    int r = 30;
     int curX = 0;
     int curY = r;
-    
-    int Fe = (pivX+1)*(pivX+1) + (pivY)*(pivY) - r*r;
-    int Fse = (pivX+1)*(pivX+1) + (pivY-1)*(pivY-1) - r*r;
     int d = 3 - (2 * r);
-    
     // END SETUP DRAW CIRCLE
     
 
